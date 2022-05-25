@@ -7,6 +7,8 @@ import { TimelineGraph } from './types';
  * Create and render a Sankey diagram along a timeline.
  */
 export default class SankeyTimeline {
+  private keyTimes: number[] = [];
+
   private links: Record<number, TimelineLink> = {};
 
   private nextLinkId = 0;
@@ -14,6 +16,18 @@ export default class SankeyTimeline {
   private nextNodeId = 0;
 
   private nodes: Record<number, TimelineNode> = {};
+
+  /**
+   * Adds a key time.
+   *
+   * @param time - The key time to add.
+   */
+  private addKeyTime(time: number) {
+    if (this.keyTimes.indexOf(time) < 0) {
+      this.keyTimes.push(time);
+      this.keyTimes.sort((a, b) => a - b);
+    }
+  }
 
   /**
    * Adds a link between two nodes.
@@ -52,6 +66,8 @@ export default class SankeyTimeline {
   ): TimelineNode {
     const node = new TimelineNode(this.nextNodeId, label, startTime, endTime);
     this.nodes[this.nextNodeId] = node;
+    this.addKeyTime(startTime);
+    this.addKeyTime(endTime);
     this.nextNodeId += 1;
     return node;
   }
@@ -106,5 +122,29 @@ export default class SankeyTimeline {
       }
     });
     return isCircular;
+  }
+
+  /**
+   * The maximum time in the graph.
+   *
+   * @returns The maximum time in the graph.
+   */
+  public get maxTime(): number {
+    if (this.keyTimes.length > 0) {
+      return this.keyTimes[this.keyTimes.length - 1];
+    }
+    return 0;
+  }
+
+  /**
+   * The minimum time in the graph.
+   *
+   * @returns The minimum time in the graph.
+   */
+  public get minTime(): number {
+    if (this.keyTimes.length > 0) {
+      return this.keyTimes[0];
+    }
+    return 0;
   }
 }

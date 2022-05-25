@@ -78,6 +78,19 @@ const svg = d3
 
 svg
   .append('g')
+  .style('width', '100%')
+  .call(
+    d3.axisBottom(
+      d3
+        .scaleLinear()
+        .domain([timeline.maxTime, timeline.minTime])
+        .range([window.innerWidth - 20, 20]),
+    ),
+  );
+
+/*
+svg
+  .append('g')
   .selectAll('rect')
   .data(graph.nodes)
   .join('rect')
@@ -104,3 +117,4 @@ svg
   })
   .append('title')
   .text((d) => `${d.label}\n${d.size}`);
+*/
