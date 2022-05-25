@@ -1,6 +1,7 @@
 import findCircuits from 'elementary-circuits-directed-graph';
 import TimelineLink from './TimelineLink';
 import TimelineNode from './TimelineNode';
+import { TimelineGraph } from './types';
 
 /**
  * Create and render a Sankey diagram along a timeline.
@@ -46,8 +47,8 @@ export default class SankeyTimeline {
    */
   public addNode(
     label: string,
-    startTime: string,
-    endTime: string,
+    startTime: number,
+    endTime: number,
   ): TimelineNode {
     const node = new TimelineNode(this.nextNodeId, label, startTime, endTime);
     this.nodes[this.nextNodeId] = node;
@@ -76,6 +77,18 @@ export default class SankeyTimeline {
       }
     });
     return findCircuits(adjList);
+  }
+
+  /**
+   * Creates the d3 graph.
+   *
+   * @returns The d3 graph object.
+   */
+  public createGraph(): TimelineGraph {
+    return {
+      links: Object.values(this.links),
+      nodes: Object.values(this.nodes),
+    };
   }
 
   /**

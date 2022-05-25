@@ -1,10 +1,11 @@
+import { sum } from 'd3';
 import type TimelineLink from './TimelineLink';
 
 /**
  * A node in the timeline.
  */
 export default class TimelineNode {
-  public endTime: string;
+  public endTime: number;
 
   public id: number;
 
@@ -14,7 +15,7 @@ export default class TimelineNode {
 
   public outgoingLinks: TimelineLink[] = [];
 
-  public startTime: string;
+  public startTime: number;
 
   /**
    * Constructs TimelineNode.
@@ -27,8 +28,8 @@ export default class TimelineNode {
   public constructor(
     id: number,
     label: string,
-    startTime: string,
-    endTime: string,
+    startTime: number,
+    endTime: number,
   ) {
     this.id = id;
     this.label = label;
@@ -56,5 +57,41 @@ export default class TimelineNode {
   public addOutgoingLink(link: TimelineLink): TimelineNode {
     this.outgoingLinks.push(link);
     return this;
+  }
+
+  /**
+   * Gets all links through the node.
+   *
+   * @returns All links through the node.
+   */
+  public get links(): TimelineLink[] {
+    return this.incomingLinks.concat(this.outgoingLinks);
+  }
+
+  /**
+   * If the node is part of a circuit.
+   *
+   * @returns If the node is part of a circuit.
+   */
+  public get partOfCircuit(): boolean {
+    let partOfCircuit = false;
+    this.links.forEach((link) => {
+      if (link.isCircular) {
+        partOfCircuit = true;
+      }
+    });
+    return partOfCircuit;
+  }
+
+  /**
+   * Gets the "size" of the node based on associated links.
+   *
+   * @returns The size of the node.
+   */
+  public get size(): number {
+    return Math.max(
+      sum(this.incomingLinks, (link) => link.flow),
+      sum(this.outgoingLinks, (link) => link.flow),
+    );
   }
 }
