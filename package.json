@@ -1,0 +1,34 @@
+{
+  "name": "d3-sankey-timeline",
+  "version": "0.1.0",
+  "description": "Create Sankey diagrams scaled along a timeline.",
+  "main": "dist/d3-sankey-timeline.js",
+  "scripts": {
+    "test": "npx jest",
+    "build": "npx webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nmde/d3-sankey-timeline.git"
+  },
+  "keywords": [
+    "Sankey",
+    "d3"
+  ],
+  "author": "nmde",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nmde/d3-sankey-timeline/issues"
+  },
+  "homepage": "https://github.com/nmde/d3-sankey-timeline#readme",
+  "devDependencies": {
+    "@types/jest": "^27.5.1",
+    "eslint": "^7.32.0",
+    "jest": "^28.1.0",
+    "nmde-common": "https://github.com/nmde/nmde-common.git#d4e254daff38343ca63ecf629e0fba0538ff0662",
+    "ts-jest": "^28.0.3",
+    "typescript": "^4.7.2",
+    "webpack": "^5.72.1",
+    "webpack-cli": "^4.9.2"
+  }
+}
