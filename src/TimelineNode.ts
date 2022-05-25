@@ -99,6 +99,24 @@ export default class TimelineNode {
   }
 
   /**
+   * The row #, to prevent overlaps.
+   *
+   * @returns The row #.
+   */
+  public get row(): number {
+    const overlaps = this.graph.findOverlaps(this);
+    let maxSmallerRow = 0;
+    overlaps.forEach((node) => {
+      if (node.id < this.id) {
+        if (node.row > maxSmallerRow) {
+          maxSmallerRow = node.row;
+        }
+      }
+    });
+    return maxSmallerRow;
+  }
+
+  /**
    * Gets the "size" of the node based on associated links.
    *
    * @returns The size of the node.
@@ -116,12 +134,7 @@ export default class TimelineNode {
    * @returns The width of the node.
    */
   public get width(): number {
-    const width = (
-      (this.graph.range[1] - this.graph.range[0]) *
-        (this.endTime / (this.graph.maxTime - this.graph.minTime)) +
-      this.graph.range[0] -
-      this.x
-    );
+    const width = this.x1 - this.x;
     if (width === 0) {
       return 1;
     }
@@ -142,11 +155,24 @@ export default class TimelineNode {
   }
 
   /**
+   * The computed end X coordinate for the node.
+   *
+   * @returns The end X coordinate.
+   */
+  public get x1(): number {
+    return (
+      (this.graph.range[1] - this.graph.range[0]) *
+        (this.endTime / (this.graph.maxTime - this.graph.minTime)) +
+      this.graph.range[0]
+    );
+  }
+
+  /**
    * The computed Y coordinate for the node.
    *
    * @returns The Y coordinate.
    */
   public get y(): number {
-    return this.id * this.height;
+    return this.row * this.height;
   }
 }

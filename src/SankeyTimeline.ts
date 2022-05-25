@@ -1,4 +1,3 @@
-import { ScaleLinear, scaleLinear } from 'd3-scale';
 import findCircuits from 'elementary-circuits-directed-graph';
 import TimelineLink from './TimelineLink';
 import TimelineNode from './TimelineNode';
@@ -67,7 +66,13 @@ export default class SankeyTimeline {
     startTime: number,
     endTime: number,
   ): TimelineNode {
-    const node = new TimelineNode(this, this.nextNodeId, label, startTime, endTime);
+    const node = new TimelineNode(
+      this,
+      this.nextNodeId,
+      label,
+      startTime,
+      endTime,
+    );
     this.nodes[this.nextNodeId] = node;
     this.addKeyTime(startTime);
     this.addKeyTime(endTime);
@@ -96,6 +101,27 @@ export default class SankeyTimeline {
       }
     });
     return findCircuits(adjList);
+  }
+
+  /**
+   * Finds nodes overlapping with the given node.
+   *
+   * @param target - The node to find overlaps for.
+   * @returns Overlapping nodes, if any.
+   */
+  public findOverlaps(target: TimelineNode): TimelineNode[] {
+    const overlaps: TimelineNode[] = [];
+    Object.values(this.nodes).forEach((node) => {
+      if (target.id !== node.id) {
+        if (
+          (target.x < node.x1 && target.x >= node.x) ||
+          (node.x < target.x1 && node.x >= target.x)
+        ) {
+          overlaps.push(node);
+        }
+      }
+    });
+    return overlaps;
   }
 
   /**
