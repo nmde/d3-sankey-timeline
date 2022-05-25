@@ -1,3 +1,4 @@
+import { ScaleLinear, scaleLinear } from 'd3-scale';
 import findCircuits from 'elementary-circuits-directed-graph';
 import TimelineLink from './TimelineLink';
 import TimelineNode from './TimelineNode';
@@ -16,6 +17,8 @@ export default class SankeyTimeline {
   private nextNodeId = 0;
 
   private nodes: Record<number, TimelineNode> = {};
+
+  public range: [number, number] = [0, 0];
 
   /**
    * Adds a key time.
@@ -64,7 +67,7 @@ export default class SankeyTimeline {
     startTime: number,
     endTime: number,
   ): TimelineNode {
-    const node = new TimelineNode(this.nextNodeId, label, startTime, endTime);
+    const node = new TimelineNode(this, this.nextNodeId, label, startTime, endTime);
     this.nodes[this.nextNodeId] = node;
     this.addKeyTime(startTime);
     this.addKeyTime(endTime);
@@ -96,11 +99,11 @@ export default class SankeyTimeline {
   }
 
   /**
-   * Creates the d3 graph.
+   * Gets the d3 graph.
    *
    * @returns The d3 graph object.
    */
-  public createGraph(): TimelineGraph {
+  public getGraph(): TimelineGraph {
     return {
       links: Object.values(this.links),
       nodes: Object.values(this.nodes),
@@ -146,5 +149,14 @@ export default class SankeyTimeline {
       return this.keyTimes[0];
     }
     return 0;
+  }
+
+  /**
+   * Sets the graph's range dimensions.
+   *
+   * @param range - The range.
+   */
+  public setRange(range: [number, number]): void {
+    this.range = range;
   }
 }

@@ -1,4 +1,5 @@
 import { sum } from 'd3';
+import type SankeyTimeline from './SankeyTimeline';
 import type TimelineLink from './TimelineLink';
 
 /**
@@ -6,6 +7,8 @@ import type TimelineLink from './TimelineLink';
  */
 export default class TimelineNode {
   public endTime: number;
+
+  public graph: SankeyTimeline;
 
   public id: number;
 
@@ -20,17 +23,20 @@ export default class TimelineNode {
   /**
    * Constructs TimelineNode.
    *
+   * @param graph - The containing graph.
    * @param id - The node's id.
    * @param label - The node's label.
    * @param startTime - The node's starting time.
    * @param endTime - The node's ending time.
    */
   public constructor(
+    graph: SankeyTimeline,
     id: number,
     label: string,
     startTime: number,
     endTime: number,
   ) {
+    this.graph = graph;
     this.id = id;
     this.label = label;
     this.startTime = startTime;
@@ -57,6 +63,15 @@ export default class TimelineNode {
   public addOutgoingLink(link: TimelineLink): TimelineNode {
     this.outgoingLinks.push(link);
     return this;
+  }
+
+  /**
+   * Gets the height of the node.
+   *
+   * @returns The height of the node.
+   */
+  public get height(): number {
+    return 100;
   }
 
   /**
@@ -93,5 +108,45 @@ export default class TimelineNode {
       sum(this.incomingLinks, (link) => link.flow),
       sum(this.outgoingLinks, (link) => link.flow),
     );
+  }
+
+  /**
+   * Gets the width of the node.
+   *
+   * @returns The width of the node.
+   */
+  public get width(): number {
+    const width = (
+      (this.graph.range[1] - this.graph.range[0]) *
+        (this.endTime / (this.graph.maxTime - this.graph.minTime)) +
+      this.graph.range[0] -
+      this.x
+    );
+    if (width === 0) {
+      return 1;
+    }
+    return width;
+  }
+
+  /**
+   * The computed X coordinate for the node.
+   *
+   * @returns The X coordinate.
+   */
+  public get x(): number {
+    return (
+      (this.graph.range[1] - this.graph.range[0]) *
+        (this.startTime / (this.graph.maxTime - this.graph.minTime)) +
+      this.graph.range[0]
+    );
+  }
+
+  /**
+   * The computed Y coordinate for the node.
+   *
+   * @returns The Y coordinate.
+   */
+  public get y(): number {
+    return this.id * this.height;
   }
 }

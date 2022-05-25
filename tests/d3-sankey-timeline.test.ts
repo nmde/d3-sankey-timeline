@@ -16,6 +16,7 @@ test('main', () => {
   const e = timeline.addLink(v3, v2, 1);
   const f = timeline.addLink(v4, v0, 12);
   const g = timeline.addLink(v2, v5, 3);
+  timeline.setRange([10, 190]);
   expect(a.isCircular).toBe(false);
   expect(b.isCircular).toBe(false);
   expect(c.isCircular).toBe(false);
@@ -37,4 +38,10 @@ test('main', () => {
   expect(v5.partOfCircuit).toBe(false);
   expect(timeline.minTime).toBe(0);
   expect(timeline.maxTime).toBe(13);
+  expect(v0.x).toBeCloseTo(10);
+  expect(v1.x).toBeCloseTo(37.692);
+  expect(v2.x).toBeCloseTo(65.384);
+  expect(v3.x).toBeCloseTo(65.384);
+  expect(v4.x).toBeCloseTo(148.462);
+  expect(v5.x).toBeCloseTo(162.308);
 });

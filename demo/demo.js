@@ -68,14 +68,18 @@ Object.keys(nodes).forEach((n) => {
 });
 
 console.log(timeline);
-const graph = timeline.createGraph();
+const range = [20, window.innerWidth - 20];
+timeline.setRange(range);
+const graph = timeline.getGraph();
 
+// Create the graph element
 const svg = d3
   .select('svg')
   .style('background', '#fff')
   .style('width', '100%')
   .style('height', '100%');
 
+// Use d3-axis to create an axis
 svg
   .append('g')
   .style('width', '100%')
@@ -83,26 +87,25 @@ svg
     d3.axisBottom(
       d3
         .scaleLinear()
-        .domain([timeline.maxTime, timeline.minTime])
-        .range([window.innerWidth - 20, 20]),
+        .domain([timeline.minTime, timeline.maxTime])
+        .range(range),
     ),
   );
 
-/*
+// Create nodes
+const color = '#dddddd';
 svg
   .append('g')
   .selectAll('rect')
   .data(graph.nodes)
   .join('rect')
-  .attr('x', (d) => {
-      console.log(d);
-      return d.x0 + 1;
-  })
-  .attr('y', (d) => d.y0)
-  .attr('height', (d) => d.y1 - d.y0)
-  .attr('width', (d) => d.x1 - d.x0)
+  .attr('x', (d) => d.x)
+  .attr('y', (d) => d.y)
+  .attr('height', (d) => d.height)
+  .attr('width', (d) => d.width)
   .attr('fill', (d) => {
     let c;
+    /*
     d.sourceLinks.forEach((link) => {
       if (c === undefined) c = link.color;
       else if (c !== link.color) c = null;
@@ -113,8 +116,8 @@ svg
         else if (c !== link.color) c = null;
       });
     }
+    */
     return (d3.color(c) || d3.color(color)).darker(0.5);
   })
   .append('title')
   .text((d) => `${d.label}\n${d.size}`);
-*/
