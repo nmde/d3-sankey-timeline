@@ -22,13 +22,18 @@
   },
   "homepage": "https://github.com/nmde/d3-sankey-timeline#readme",
   "devDependencies": {
+    "@types/elementary-circuits-directed-graph": "^1.2.0",
     "@types/jest": "^27.5.1",
     "eslint": "^7.32.0",
     "jest": "^28.1.0",
+    "jest-extended": "^2.0.0",
     "nmde-common": "https://github.com/nmde/nmde-common.git#d4e254daff38343ca63ecf629e0fba0538ff0662",
     "ts-jest": "^28.0.3",
     "typescript": "^4.7.2",
     "webpack": "^5.72.1",
     "webpack-cli": "^4.9.2"
+  },
+  "dependencies": {
+    "elementary-circuits-directed-graph": "^1.3.1"
   }
 }

@@ -1,1 +1,3 @@
-export default (): number => 100;
+import SankeyTimeline from './SankeyTimeline';
+
+export default SankeyTimeline;
