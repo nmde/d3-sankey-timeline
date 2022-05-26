@@ -60,5 +60,5 @@ test('main', () => {
   expect(v2.row).toBe(0);
   expect(v3.row).toBe(1);
   expect(v4.row).toBe(1);
-  expect(v5.row).toBe(0);
+  expect(v5.row).toBe(2);
 });

@@ -105,7 +105,8 @@ export default class TimelineNode {
    */
   public get row(): number {
     const overlaps = this.graph.findOverlaps(this);
-    let maxSmallerRow = 0;
+    let maxSmallerRow = -1;
+    console.log(`${this.label}: ${overlaps.map((o) => o.label).join(',')}`);
     overlaps.forEach((node) => {
       if (node.id < this.id) {
         if (node.row > maxSmallerRow) {
@@ -113,7 +114,7 @@ export default class TimelineNode {
         }
       }
     });
-    return maxSmallerRow;
+    return maxSmallerRow + 1;
   }
 
   /**

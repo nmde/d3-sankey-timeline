@@ -114,14 +114,14 @@ export default class SankeyTimeline {
     Object.values(this.nodes).forEach((node) => {
       if (target.id !== node.id) {
         if (
-          (target.x < node.x1 && target.x >= node.x) ||
-          (node.x < target.x1 && node.x >= target.x)
+          (target.x1 > node.x && target.x < node.x) ||
+          (node.x1 > target.x && node.x < target.x)
         ) {
           overlaps.push(node);
         }
       }
     });
-    return overlaps;
+    return overlaps.sort((a, b) => a.id - b.id);
   }
 
   /**
