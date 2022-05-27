@@ -1,3 +1,4 @@
+import { DefaultLinkObject, Link, linkHorizontal } from 'd3';
 import findCircuits from 'elementary-circuits-directed-graph';
 import TimelineLink from './TimelineLink';
 import TimelineNode from './TimelineNode';
@@ -159,7 +160,7 @@ export default class SankeyTimeline {
       } else {
         re = 'bottom';
       }
-      if (link.circularLinkType === 'top') {
+      if (re === 'top') {
         this.topLinkCount += 1;
       } else {
         this.bottomLinkCount += 1;

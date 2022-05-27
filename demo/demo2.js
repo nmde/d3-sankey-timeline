@@ -15,6 +15,7 @@ const d = timeline.addLink(v2, v4, 4);
 const e = timeline.addLink(v3, v2, 1);
 const f = timeline.addLink(v4, v0, 12);
 const g = timeline.addLink(v2, v5, 3);
+const h = timeline.addLink(v5, v5, 2);
 const range = [0, window.innerWidth - 10];
 timeline.setRange(range);
 

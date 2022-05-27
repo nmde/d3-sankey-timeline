@@ -1,4 +1,4 @@
-/* global d3 */
+/* global d3, sankeyTimeline */
 
 window.renderDemo = function renderDemo(timeline, range) {
   const graph = timeline.getGraph();
@@ -52,4 +52,21 @@ window.renderDemo = function renderDemo(timeline, range) {
     })
     .append('title')
     .text((d) => `${d.label}\n${d.size}`);
+
+  // Create links
+  const link = svg
+    .append('g')
+    .attr('fill', 'none')
+    .selectAll('g')
+    .data(graph.links)
+    .join('g')
+    .attr('stroke', (d) => d3.color(d.color) || color)
+    .style('mix-blend-mode', 'multiply');
+
+  link
+    .append('path')
+    .attr('d', sankeyTimeline.sankeyLinkHorizontal())
+    .attr('stroke-width', (d) => Math.max(1, d.width));
+
+  link.append('title').text((d) => `${d.source.label} → ${d.target.label}\n${d.flow}`);
 };

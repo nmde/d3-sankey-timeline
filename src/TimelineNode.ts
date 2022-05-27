@@ -68,6 +68,54 @@ export default class TimelineNode {
   }
 
   /**
+   * Calculates the Y coordinate for outgoing links.
+   *
+   * @param link - The link to calculate for.
+   * @returns The starting Y coordinate.
+   */
+  public getY(link: TimelineLink): number {
+    let ycycle = this.y1;
+    let index = -1;
+    this.outgoingLinks.forEach((l, i) => {
+      if (l.id === link.id) {
+        index = i;
+      }
+    });
+    for (let i = 0; i < index - 1; i += 1) {
+      if (this.outgoingLinks[i].isCircular) {
+        ycycle -= this.outgoingLinks[i].width;
+      } else {
+        ycycle += this.outgoingLinks[i].width;
+      }
+    }
+    return ycycle - link.width / 2;
+  }
+
+  /**
+   * Calculates the Y coordinate for incoming links.
+   *
+   * @param link - The link to calculate for.
+   * @returns The ending Y coordinate.
+   */
+  public getY1(link: TimelineLink): number {
+    let ycycle = this.y1;
+    let index = -1;
+    this.incomingLinks.forEach((l, i) => {
+      if (l.id === link.id) {
+        index = i;
+      }
+    });
+    for (let i = 0; i < index - 1; i += 1) {
+      if (this.incomingLinks[i].isCircular) {
+        ycycle -= this.incomingLinks[i].width;
+      } else {
+        ycycle += this.incomingLinks[i].width;
+      }
+    }
+    return ycycle - link.width / 2;
+  }
+
+  /**
    * Gets the height of the node.
    *
    * @returns The height of the node.

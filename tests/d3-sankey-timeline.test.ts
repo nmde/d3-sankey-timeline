@@ -76,6 +76,10 @@ test('main', () => {
   expect(timeline.maxY).toBe(200);
   expect(f.circularLinkType).toBe('bottom');
   expect(h.circularLinkType).toBe('top');
+  expect(f.isSelfLinking).toBe(false);
+  expect(h.isSelfLinking).toBe(true);
+  expect(f.isOnlyCircularLink).toBe(true);
+  expect(h.isOnlyCircularLink).toBe(true);
 });
 
 test('edge cases', () => {
