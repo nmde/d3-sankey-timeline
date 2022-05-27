@@ -185,7 +185,6 @@ export default class TimelineLink {
         const d = d0 as unknown as TimelineLink;
         return [d.target.x, d.y1];
       })(this as unknown as DefaultLinkObject);
-    console.log(normalPath);
     return normalPath;
   }
 
@@ -306,7 +305,7 @@ export default class TimelineLink {
    * @returns The link's width.
    */
   public get width(): number {
-    return this.flow * 100;
+    return 100;
   }
 
   /**
