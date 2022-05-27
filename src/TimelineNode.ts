@@ -22,6 +22,8 @@ export default class TimelineNode {
 
   public startTime: number;
 
+  public row!: number;
+
   /**
    * Constructs TimelineNode.
    *
@@ -146,24 +148,6 @@ export default class TimelineNode {
       }
     });
     return partOfCircuit;
-  }
-
-  /**
-   * The row #, to prevent overlaps.
-   *
-   * @returns The row #.
-   */
-  public get row(): number {
-    const overlaps = this.graph.findOverlaps(this);
-    let maxSmallerRow = -1;
-    overlaps.forEach((node) => {
-      if (node.id < this.id) {
-        if (node.row > maxSmallerRow) {
-          maxSmallerRow = node.row;
-        }
-      }
-    });
-    return maxSmallerRow + 1;
   }
 
   /**

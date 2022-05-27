@@ -82,6 +82,7 @@ export default class SankeyTimeline {
       endTime,
     );
     this.nodes[this.nextNodeId] = node;
+    node.row = this.getRow(node);
     this.addKeyTime(startTime);
     this.addKeyTime(endTime);
     this.nextNodeId += 1;
@@ -129,7 +130,7 @@ export default class SankeyTimeline {
         }
       }
     });
-    return overlaps.sort((a, b) => a.id - b.id);
+    return overlaps;
   }
 
   /**
@@ -167,6 +168,21 @@ export default class SankeyTimeline {
       }
     }
     return re;
+  }
+
+  /**
+   * Finds the row for a node.
+   *
+   * @param node - The node to find the row for.
+   * @returns The node's row.
+   */
+  private getRow(node: TimelineNode) {
+    const overlapRows = this.findOverlaps(node).map((o) => o.row);
+    let minEmptyRow = 0;
+    while (overlapRows.indexOf(minEmptyRow) >= 0) {
+      minEmptyRow += 1;
+    }
+    return minEmptyRow;
   }
 
   /**

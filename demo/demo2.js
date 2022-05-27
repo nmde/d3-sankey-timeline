@@ -60,8 +60,8 @@ const steps = [
   },
 ];
 
-const animated = false;
-const stepTime = 1000;
+const animated = true;
+const stepTime = 100;
 const maxStep = steps.length;
 if (animated) {
   steps[0]();

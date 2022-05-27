@@ -195,9 +195,11 @@ export default class TimelineLink {
       const y1 = this.target.y + this.target.height / 2;
       const curveHeight = 50;
       const curveModifier = 200;
-      return `M${this.source.x1},${y}C${this.source.x1 + curveModifier},${y - curveHeight},${
-        this.target.x - curveModifier
-      },${y1 - curveHeight},${this.target.x},${y1}`;
+      return `M${this.source.x1 - 5},${y}C${this.source.x1 + curveModifier},${
+        y - curveHeight
+      },${this.target.x - curveModifier},${y1 - curveHeight},${
+        this.target.x + 5
+      },${y1}`;
     }
     return this.normalPathData as string;
   }

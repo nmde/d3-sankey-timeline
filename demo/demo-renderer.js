@@ -25,7 +25,7 @@ window.renderDemo = function renderDemo(timeline, range) {
 
   // Create nodes
   let colorIndex = 0;
-  const color = d3.interpolateSpectral;
+  const color = d3.interpolateRainbow;
   svg
     .append('g')
     .selectAll('rect')
