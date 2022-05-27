@@ -1,7 +1,5 @@
-import { DefaultLinkObject, linkHorizontal } from 'd3';
 import type SankeyTimeline from './SankeyTimeline';
 import TimelineNode from './TimelineNode';
-import type { CircularPathData } from './types';
 
 /**
  * A link between two nodes in the graph.
@@ -45,105 +43,6 @@ export default class TimelineLink {
   }
 
   /**
-   * Computes the circular path data.
-   *
-   * @returns The circular path data.
-   */
-  public get circularPathData(): CircularPathData {
-    const baseRadius = 10;
-    const buffer = 5;
-    const verticalMargin = 25;
-    const radiusOffset = 0;
-    const circularLinkGap = 2;
-    const circularPathData: CircularPathData = {
-      arcRadius: this.width + baseRadius,
-      leftFullExtent: 0,
-      leftInnerExtent: 0,
-      leftLargeArcRadius: 0,
-      leftNodeBuffer: buffer,
-      leftSmallArcRadius: 0,
-      rightFullExtent: 0,
-      rightInnerExtent: 0,
-      rightLargeArcRadius: 0,
-      rightNodeBuffer: buffer,
-      rightSmallArcRadius: 0,
-      sourceWidth: this.source.width,
-      sourceX: this.source.x1,
-      sourceY: this.y,
-      targetX: this.target.x,
-      targetY: this.y1,
-      verticalBuffer: 0,
-      verticalFullExtent: 0,
-      verticalLeftInnerExtent: 0,
-      verticalRightInnerExtent: 0,
-    };
-    if (this.isCircular) {
-      if (this.isSelfLinking && this.isOnlyCircularLink) {
-        circularPathData.leftSmallArcRadius = baseRadius + this.width / 2;
-        circularPathData.leftLargeArcRadius = baseRadius + this.width / 2;
-        circularPathData.rightSmallArcRadius = baseRadius + this.width / 2;
-        circularPathData.rightLargeArcRadius = baseRadius + this.width / 2;
-        if (this.circularLinkType === 'bottom') {
-          circularPathData.verticalFullExtent =
-            this.source.y1 + verticalMargin + circularPathData.verticalBuffer;
-          circularPathData.verticalLeftInnerExtent =
-            circularPathData.verticalFullExtent -
-            circularPathData.leftLargeArcRadius;
-          circularPathData.verticalRightInnerExtent =
-            circularPathData.verticalFullExtent -
-            circularPathData.rightLargeArcRadius;
-        } else {
-          circularPathData.verticalFullExtent =
-            this.source.y - verticalMargin - circularPathData.verticalBuffer;
-          circularPathData.verticalLeftInnerExtent =
-            circularPathData.verticalFullExtent +
-            circularPathData.leftLargeArcRadius;
-          circularPathData.verticalRightInnerExtent =
-            circularPathData.verticalFullExtent +
-            circularPathData.rightLargeArcRadius;
-        }
-      } else {
-        circularPathData.leftSmallArcRadius =
-          baseRadius + this.width / 2 + radiusOffset;
-        circularPathData.leftLargeArcRadius =
-          baseRadius +
-          this.width / 2 +
-          this.id * circularLinkGap +
-          radiusOffset;
-        circularPathData.rightSmallArcRadius =
-          baseRadius + this.width / 2 + radiusOffset;
-        circularPathData.rightLargeArcRadius =
-          baseRadius +
-          this.width / 2 +
-          this.id * circularLinkGap +
-          radiusOffset;
-        if (this.circularLinkType === 'bottom') {
-          circularPathData.verticalFullExtent =
-            Math.max(this.source.y1, this.target.y1) +
-            verticalMargin +
-            circularPathData.verticalBuffer;
-          circularPathData.verticalLeftInnerExtent =
-            circularPathData.verticalFullExtent -
-            circularPathData.leftLargeArcRadius;
-          circularPathData.verticalRightInnerExtent =
-            circularPathData.verticalFullExtent -
-            circularPathData.rightLargeArcRadius;
-        } else {
-          circularPathData.verticalFullExtent =
-            this.graph.minY - verticalMargin - circularPathData.verticalBuffer;
-          circularPathData.verticalLeftInnerExtent =
-            circularPathData.verticalFullExtent +
-            circularPathData.leftLargeArcRadius;
-          circularPathData.verticalRightInnerExtent =
-            circularPathData.verticalFullExtent +
-            circularPathData.rightLargeArcRadius;
-        }
-      }
-    }
-    return circularPathData;
-  }
-
-  /**
    * If the link is the only circular link of its nodes.
    *
    * @returns If the link is the only circular link.
@@ -168,23 +67,6 @@ export default class TimelineLink {
   }
 
   /**
-   * Normal path data (non-circular links).
-   *
-   * @returns The normal path data.
-   */
-  public get normalPathData(): string | null {
-    if (this.isCircular) {
-      return null;
-    }
-    const curveModifier = 200;
-    const y = this.source.y + this.source.height / 2;
-    const y1 = this.target.y + this.target.height / 2;
-    return `M${this.source.x1},${y}C${this.source.x1 + curveModifier},${y},${
-      this.target.x - curveModifier
-    },${y1},${this.target.x},${y1}`;
-  }
-
-  /**
    * Gets the path string for the link.
    *
    * @returns The path string.
@@ -201,7 +83,12 @@ export default class TimelineLink {
         this.target.x + 5
       },${y1}`;
     }
-    return this.normalPathData as string;
+    const curveModifier = 200;
+    const y = this.source.y + this.source.height / 2;
+    const y1 = this.target.y + this.target.height / 2;
+    return `M${this.source.x1},${y}C${this.source.x1 + curveModifier},${y},${
+      this.target.x - curveModifier
+    },${y1},${this.target.x},${y1}`;
   }
 
   /**

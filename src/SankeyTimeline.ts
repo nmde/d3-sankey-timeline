@@ -1,4 +1,3 @@
-import { DefaultLinkObject, Link, linkHorizontal } from 'd3';
 import findCircuits from 'elementary-circuits-directed-graph';
 import TimelineLink from './TimelineLink';
 import TimelineNode from './TimelineNode';
@@ -54,9 +53,6 @@ export default class SankeyTimeline {
     target.addIncomingLink(link);
     this.links[this.nextLinkId] = link;
     link.isCircular = this.isCircular(link);
-    if (link.isCircular) {
-      link.circularLinkType = this.getCircularLinkType(link);
-    }
     this.nextLinkId += 1;
     return link;
   }
@@ -143,31 +139,6 @@ export default class SankeyTimeline {
       links: Object.values(this.links),
       nodes: Object.values(this.nodes),
     };
-  }
-
-  /**
-   * Gets the link type for the given link.
-   *
-   * @param link - The target link.
-   * @returns The link type.
-   */
-  private getCircularLinkType(link: TimelineLink): string | null {
-    let re: string | null = null;
-    if (link.isCircular) {
-      if (link.source.circularLinkType || link.target.circularLinkType) {
-        re = link.source.circularLinkType || link.target.circularLinkType;
-      } else if (this.topLinkCount < this.bottomLinkCount) {
-        re = 'top';
-      } else {
-        re = 'bottom';
-      }
-      if (re === 'top') {
-        this.topLinkCount += 1;
-      } else {
-        this.bottomLinkCount += 1;
-      }
-    }
-    return re;
   }
 
   /**
