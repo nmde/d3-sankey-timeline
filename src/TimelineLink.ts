@@ -191,106 +191,13 @@ export default class TimelineLink {
    */
   public get path(): string {
     if (this.isCircular) {
-      let pathString = '';
-      if (this.circularLinkType === 'top') {
-        pathString =
-          // start at the right of the source node
-          `M${this.circularPathData.sourceX} ${this.circularPathData.sourceY} ` +
-          // line right to buffer point
-          `L${this.circularPathData.leftInnerExtent} ${this.circularPathData.sourceY} ` +
-          // Arc around: Centre of arc X and  //Centre of arc Y
-          `A${this.circularPathData.leftLargeArcRadius} ${
-            this.circularPathData.leftSmallArcRadius
-          } 0 0 0 ${
-            // End of arc X //End of arc Y
-            this.circularPathData.leftFullExtent
-          } ${
-            this.circularPathData.sourceY -
-            this.circularPathData.leftSmallArcRadius
-          } ` + // End of arc X
-          // line up to buffer point
-          `L${this.circularPathData.leftFullExtent} ${this.circularPathData.verticalLeftInnerExtent} ` +
-          // Arc around: Centre of arc X and  //Centre of arc Y
-          `A${this.circularPathData.leftLargeArcRadius} ${
-            this.circularPathData.leftLargeArcRadius
-          } 0 0 0 ${
-            // End of arc X //End of arc Y
-            this.circularPathData.leftInnerExtent
-          } ${this.circularPathData.verticalFullExtent} ` + // End of arc X
-          // line left to buffer point
-          `L${this.circularPathData.rightInnerExtent} ${this.circularPathData.verticalFullExtent} ` +
-          // Arc around: Centre of arc X and  //Centre of arc Y
-          `A${this.circularPathData.rightLargeArcRadius} ${
-            this.circularPathData.rightLargeArcRadius
-          } 0 0 0 ${
-            // End of arc X //End of arc Y
-            this.circularPathData.rightFullExtent
-          } ${this.circularPathData.verticalRightInnerExtent} ` + // End of arc X
-          // line down
-          `L${this.circularPathData.rightFullExtent} ${
-            this.circularPathData.targetY -
-            this.circularPathData.rightSmallArcRadius
-          } ` +
-          // Arc around: Centre of arc X and  //Centre of arc Y
-          `A${this.circularPathData.rightLargeArcRadius} ${
-            this.circularPathData.rightSmallArcRadius
-          } 0 0 0 ${
-            // End of arc X //End of arc Y
-            this.circularPathData.rightInnerExtent
-          } ${this.circularPathData.targetY} ` + // End of arc X
-          // line to end
-          `L${this.circularPathData.targetX} ${this.circularPathData.targetY}`;
-      } else {
-        // bottom path
-        pathString =
-          // start at the right of the source node
-          `M${this.circularPathData.sourceX} ${this.circularPathData.sourceY} ` +
-          // line right to buffer point
-          `L${this.circularPathData.leftInnerExtent} ${this.circularPathData.sourceY} ` +
-          // Arc around: Centre of arc X and  //Centre of arc Y
-          `A${this.circularPathData.leftLargeArcRadius} ${
-            this.circularPathData.leftSmallArcRadius
-          } 0 0 1 ${
-            // End of arc X //End of arc Y
-            this.circularPathData.leftFullExtent
-          } ${
-            this.circularPathData.sourceY +
-            this.circularPathData.leftSmallArcRadius
-          } ` + // End of arc X
-          // line down to buffer point
-          `L${this.circularPathData.leftFullExtent} ${this.circularPathData.verticalLeftInnerExtent} ` +
-          // Arc around: Centre of arc X and  //Centre of arc Y
-          `A${this.circularPathData.leftLargeArcRadius} ${
-            this.circularPathData.leftLargeArcRadius
-          } 0 0 1 ${
-            // End of arc X //End of arc Y
-            this.circularPathData.leftInnerExtent
-          } ${this.circularPathData.verticalFullExtent} ` + // End of arc X
-          // line left to buffer point
-          `L${this.circularPathData.rightInnerExtent} ${this.circularPathData.verticalFullExtent} ` +
-          // Arc around: Centre of arc X and  //Centre of arc Y
-          `A${this.circularPathData.rightLargeArcRadius} ${
-            this.circularPathData.rightLargeArcRadius
-          } 0 0 1 ${
-            // End of arc X //End of arc Y
-            this.circularPathData.rightFullExtent
-          } ${this.circularPathData.verticalRightInnerExtent} ` + // End of arc X
-          // line up
-          `L${this.circularPathData.rightFullExtent} ${
-            this.circularPathData.targetY +
-            this.circularPathData.rightSmallArcRadius
-          } ` +
-          // Arc around: Centre of arc X and  //Centre of arc Y
-          `A${this.circularPathData.rightLargeArcRadius} ${
-            this.circularPathData.rightSmallArcRadius
-          } 0 0 1 ${
-            // End of arc X //End of arc Y
-            this.circularPathData.rightInnerExtent
-          } ${this.circularPathData.targetY} ` + // End of arc X
-          // line to end
-          `L${this.circularPathData.targetX} ${this.circularPathData.targetY}`;
-      }
-      return pathString;
+      const y = this.source.y + this.source.height / 2;
+      const y1 = this.target.y + this.target.height / 2;
+      const curveHeight = 50;
+      const curveModifier = 200;
+      return `M${this.source.x1},${y}C${this.source.x1 + curveModifier},${y - curveHeight},${
+        this.target.x - curveModifier
+      },${y1 - curveHeight},${this.target.x},${y1}`;
     }
     return this.normalPathData as string;
   }
