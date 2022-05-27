@@ -2,7 +2,7 @@
 /* global d3, sankeyTimeline */
 
 const timeline = new sankeyTimeline.default();
-const margin = 100;
+const margin = 0;
 const range = [margin, window.innerWidth - margin];
 timeline.setRange(range);
 

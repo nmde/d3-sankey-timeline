@@ -43,6 +43,23 @@ export default class TimelineLink {
   }
 
   /**
+   * Gets the bezier curve of the link.
+   *
+   * @returns The bezier curve.
+   */
+  public get curve(): number[][] {
+    const curveModifier = 200;
+    const y = this.source.y + this.source.height / 2;
+    const y1 = this.target.y + this.target.height / 2;
+    return [
+      [this.source.x1, y],
+      [this.source.x1 + curveModifier, y],
+      [this.target.x - curveModifier, y1],
+      [this.target.x, y1],
+    ];
+  }
+
+  /**
    * If the link is the only circular link of its nodes.
    *
    * @returns If the link is the only circular link.
@@ -67,6 +84,28 @@ export default class TimelineLink {
   }
 
   /**
+   * The approximate overlap range.
+   *
+   * @returns The approximate overlap range.
+   */
+  public get overlapRange(): number[] {
+    if (this.isCircular) {
+      return [0, 0];
+    }
+    const a = [this.source.x1, this.source.y + this.source.height / 2];
+    const b = [this.target.x - 100, this.target.y + this.target.height / 2];
+    const c = [this.source.x1 + 100, this.source.y + this.source.height / 2];
+    const d = [this.target.x, this.target.y + this.target.height / 2];
+    console.log(
+      `(x) => ((${b[1]} - ${a[1]}) / (${a[0]} - ${b[0]})) * x - ${this.source.x1} - ${this.width}`,
+    );
+    console.log(
+      `(x) => ((${d[1]} - ${c[1]}) / (${c[0]} - ${d[0]})) * x - ${this.target.x} - ${this.width}`,
+    );
+    return [];
+  }
+
+  /**
    * Gets the path string for the link.
    *
    * @returns The path string.
@@ -83,12 +122,7 @@ export default class TimelineLink {
         this.target.x + 5
       },${y1}`;
     }
-    const curveModifier = 200;
-    const y = this.source.y + this.source.height / 2;
-    const y1 = this.target.y + this.target.height / 2;
-    return `M${this.source.x1},${y}C${this.source.x1 + curveModifier},${y},${
-      this.target.x - curveModifier
-    },${y1},${this.target.x},${y1}`;
+    return `M${this.curve[0][0]},${this.curve[0][1]}C${this.curve[1][0]},${this.curve[1][1]},${this.curve[2][0]},${this.curve[2][1]},${this.curve[3][0]},${this.curve[3][1]}`;
   }
 
   /**
@@ -97,7 +131,7 @@ export default class TimelineLink {
    * @returns The link's width.
    */
   public get width(): number {
-    return 100 * (this.flow / this.graph.maxFlow);
+    return 1; /* 100 * (this.flow / this.graph.maxFlow); */
   }
 
   /**

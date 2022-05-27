@@ -1,4 +1,5 @@
 import findCircuits from 'elementary-circuits-directed-graph';
+import { bezierBezierIntersection } from 'flo-bezier3';
 import TimelineLink from './TimelineLink';
 import TimelineNode from './TimelineNode';
 import { TimelineGraph } from './types';
@@ -109,6 +110,24 @@ export default class SankeyTimeline {
   }
 
   /**
+   * Finds links overlapping with the given node.
+   *
+   * @param target - The node to find overlaps for.
+   * @returns The overlapping links.
+   */
+  public findLinkOverlaps(target: TimelineNode): TimelineLink[] {
+    const linkOverlaps: TimelineLink[] = [];
+    Object.values(this.links).forEach((link) => {
+      target.boundingBezierCurves.forEach((curve) => {
+        if (bezierBezierIntersection(curve, link.curve).length > 0) {
+          linkOverlaps.push(link);
+        }
+      });
+    });
+    return linkOverlaps;
+  }
+
+  /**
    * Finds nodes overlapping with the given node.
    *
    * @param target - The node to find overlaps for.
@@ -153,6 +172,7 @@ export default class SankeyTimeline {
     while (overlapRows.indexOf(minEmptyRow) >= 0) {
       minEmptyRow += 1;
     }
+    this.findLinkOverlaps(node);
     return minEmptyRow;
   }
 

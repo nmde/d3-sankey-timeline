@@ -18,6 +18,8 @@ export default class TimelineNode {
 
   public label: string;
 
+  public netAdjustment = 0;
+
   public outgoingLinks: TimelineLink[] = [];
 
   public startTime: number;
@@ -67,6 +69,25 @@ export default class TimelineNode {
   public addOutgoingLink(link: TimelineLink): TimelineNode {
     this.outgoingLinks.push(link);
     return this;
+  }
+
+  /**
+   * Bezier-ish curves that bound the node box.
+   *
+   * @returns The bounding curves.
+   */
+  public get boundingBezierCurves(): number[][][] {
+    const topLeft = [this.x, this.y];
+    const topRight = [this.x1, this.y];
+    const bottomLeft = [this.x, this.y1];
+    const bottomRight = [this.x1, this.y1];
+    const boundingCurves: number[][][] = [
+      [topLeft, topLeft, topRight, topRight],
+      [topRight, topRight, bottomRight, bottomRight],
+      [bottomRight, bottomRight, bottomLeft, bottomLeft],
+      [bottomLeft, bottomLeft, topLeft, topLeft],
+    ];
+    return boundingCurves;
   }
 
   /**
