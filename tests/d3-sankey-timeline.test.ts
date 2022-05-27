@@ -44,6 +44,7 @@ test('main', () => {
   expect(v3.x).toBeCloseTo(51.538);
   expect(v4.x).toBeCloseTo(93.077);
   expect(v5.x).toBeCloseTo(162.308);
+  expect(v0.width).toBeCloseTo(27.692);
   expect(timeline.findOverlaps(v0).length).toBe(0);
   expect(timeline.findOverlaps(v1).length).toBe(1);
   expect(timeline.findOverlaps(v2).length).toBe(2);
@@ -61,4 +62,22 @@ test('main', () => {
   expect(v3.row).toBe(1);
   expect(v4.row).toBe(1);
   expect(v5.row).toBe(2);
+  expect(v0.y).toBe(0);
+  expect(v1.y).toBe(0);
+  expect(v2.y).toBe(0);
+  expect(v3.y).toBe(100);
+  expect(v4.y).toBe(100);
+  expect(v5.y).toBe(200);
+  expect(timeline.minX).toBe(10);
+  expect(timeline.maxX).toBeCloseTo(162.308);
+  expect(timeline.minY).toBe(0);
+  expect(timeline.maxY).toBe(200);
+});
+
+test('edge cases', () => {
+  const timeline = new SankeyTimeline();
+  expect(timeline.maxTime).toBe(0);
+  expect(timeline.minTime).toBe(0);
+  const zeroWidth = timeline.addNode('zeroWidth', 0, 0);
+  expect(zeroWidth.width).toBe(1);
 });

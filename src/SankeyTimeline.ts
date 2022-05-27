@@ -44,7 +44,7 @@ export default class SankeyTimeline {
     target: TimelineNode,
     flow: number,
   ): TimelineLink {
-    const link = new TimelineLink(this.nextLinkId, source, target, flow);
+    const link = new TimelineLink(this, this.nextLinkId, source, target, flow);
     source.addOutgoingLink(link);
     target.addIncomingLink(link);
     this.links[this.nextLinkId] = link;
@@ -166,6 +166,36 @@ export default class SankeyTimeline {
   }
 
   /**
+   * Gets the largest X value in the graph.
+   *
+   * @returns The largest X value in the graph.
+   */
+  public get maxX(): number {
+    let maxX = 0;
+    Object.values(this.nodes).forEach((node) => {
+      if (node.x > maxX) {
+        maxX = node.x;
+      }
+    });
+    return maxX;
+  }
+
+  /**
+   * Gets the largest Y value in the graph.
+   *
+   * @returns The largest Y value in the graph.
+   */
+  public get maxY(): number {
+    let maxY = 0;
+    Object.values(this.nodes).forEach((node) => {
+      if (node.y > maxY) {
+        maxY = node.y;
+      }
+    });
+    return maxY;
+  }
+
+  /**
    * The minimum time in the graph.
    *
    * @returns The minimum time in the graph.
@@ -175,6 +205,36 @@ export default class SankeyTimeline {
       return this.keyTimes[0];
     }
     return 0;
+  }
+
+  /**
+   * Gets the smallest X value in the graph.
+   *
+   * @returns The smallest X value in the graph.
+   */
+  public get minX(): number {
+    let minX = Infinity;
+    Object.values(this.nodes).forEach((node) => {
+      if (node.x < minX) {
+        minX = node.x;
+      }
+    });
+    return minX;
+  }
+
+  /**
+   * Gets the smallest Y value in the graph.
+   *
+   * @returns The smallest Y value in the graph.
+   */
+  public get minY(): number {
+    let minY = Infinity;
+    Object.values(this.nodes).forEach((node) => {
+      if (node.y < minY) {
+        minY = node.y;
+      }
+    });
+    return minY;
   }
 
   /**

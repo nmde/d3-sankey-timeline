@@ -106,7 +106,6 @@ export default class TimelineNode {
   public get row(): number {
     const overlaps = this.graph.findOverlaps(this);
     let maxSmallerRow = -1;
-    console.log(`${this.label}: ${overlaps.map((o) => o.label).join(',')}`);
     overlaps.forEach((node) => {
       if (node.id < this.id) {
         if (node.row > maxSmallerRow) {
@@ -175,5 +174,14 @@ export default class TimelineNode {
    */
   public get y(): number {
     return this.row * this.height;
+  }
+
+  /**
+   * The computed Y bound for the node.
+   *
+   * @returns The Y bound coordinate.
+   */
+  public get y1(): number {
+    return this.y + this.height;
   }
 }
