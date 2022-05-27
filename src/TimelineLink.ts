@@ -7,6 +7,8 @@ import type { CircularPathData } from './types';
  * A link between two nodes in the graph.
  */
 export default class TimelineLink {
+  public circularLinkType: string | null = null;
+
   public flow: number;
 
   public graph: SankeyTimeline;
@@ -40,14 +42,5 @@ export default class TimelineLink {
     this.source = source;
     this.target = target;
     this.flow = flow;
-  }
-
-  /**
-   * Gets the circular link type.
-   *
-   * @returns The circular link type.
-   */
-  public get circularLinkType(): string {
-    return 'top';
   }
 }

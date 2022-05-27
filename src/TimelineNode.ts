@@ -6,6 +6,8 @@ import type TimelineLink from './TimelineLink';
  * A node in the timeline.
  */
 export default class TimelineNode {
+  public circularLinkType: string | null = null;
+
   public endTime: number;
 
   public graph: SankeyTimeline;
@@ -135,7 +137,7 @@ export default class TimelineNode {
    */
   public get width(): number {
     const width = this.x1 - this.x;
-    if (width === 0) {
+    if (width === 0 || Number.isNaN(width)) {
       return 1;
     }
     return width;

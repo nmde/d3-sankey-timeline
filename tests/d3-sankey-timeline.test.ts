@@ -16,6 +16,7 @@ test('main', () => {
   const e = timeline.addLink(v3, v2, 1);
   const f = timeline.addLink(v4, v0, 12);
   const g = timeline.addLink(v2, v5, 3);
+  const h = timeline.addLink(v5, v5, 2);
   timeline.setRange([10, 190]);
   expect(a.isCircular).toBe(false);
   expect(b.isCircular).toBe(false);
@@ -24,18 +25,19 @@ test('main', () => {
   expect(e.isCircular).toBe(false);
   expect(f.isCircular).toBe(true);
   expect(g.isCircular).toBe(false);
+  expect(h.isCircular).toBe(true);
   expect(v0.size).toBe(12);
   expect(v1.size).toBe(40);
   expect(v2.size).toBe(11);
   expect(v3.size).toBe(30);
   expect(v4.size).toBe(12);
-  expect(v5.size).toBe(3);
+  expect(v5.size).toBe(5);
   expect(v0.partOfCircuit).toBe(true);
   expect(v1.partOfCircuit).toBe(false);
   expect(v2.partOfCircuit).toBe(false);
   expect(v3.partOfCircuit).toBe(false);
   expect(v4.partOfCircuit).toBe(true);
-  expect(v5.partOfCircuit).toBe(false);
+  expect(v5.partOfCircuit).toBe(true);
   expect(timeline.minTime).toBe(0);
   expect(timeline.maxTime).toBe(13);
   expect(v0.x).toBeCloseTo(10);
@@ -72,12 +74,15 @@ test('main', () => {
   expect(timeline.maxX).toBeCloseTo(162.308);
   expect(timeline.minY).toBe(0);
   expect(timeline.maxY).toBe(200);
+  expect(f.circularLinkType).toBe('bottom');
+  expect(h.circularLinkType).toBe('top');
 });
 
 test('edge cases', () => {
   const timeline = new SankeyTimeline();
   expect(timeline.maxTime).toBe(0);
   expect(timeline.minTime).toBe(0);
+  timeline.setRange([0, 100]);
   const zeroWidth = timeline.addNode('zeroWidth', 0, 0);
   expect(zeroWidth.width).toBe(1);
 });

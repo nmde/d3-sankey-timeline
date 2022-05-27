@@ -7,6 +7,8 @@ import { TimelineGraph } from './types';
  * Create and render a Sankey diagram along a timeline.
  */
 export default class SankeyTimeline {
+  private bottomLinkCount = 0;
+
   private keyTimes: number[] = [];
 
   private links: Record<number, TimelineLink> = {};
@@ -18,6 +20,8 @@ export default class SankeyTimeline {
   private nodes: Record<number, TimelineNode> = {};
 
   public range: [number, number] = [0, 0];
+
+  private topLinkCount = 0;
 
   /**
    * Adds a key time.
@@ -49,6 +53,9 @@ export default class SankeyTimeline {
     target.addIncomingLink(link);
     this.links[this.nextLinkId] = link;
     link.isCircular = this.isCircular(link);
+    if (link.isCircular) {
+      link.circularLinkType = this.getCircularLinkType(link);
+    }
     this.nextLinkId += 1;
     return link;
   }
@@ -134,6 +141,31 @@ export default class SankeyTimeline {
       links: Object.values(this.links),
       nodes: Object.values(this.nodes),
     };
+  }
+
+  /**
+   * Gets the link type for the given link.
+   *
+   * @param link - The target link.
+   * @returns The link type.
+   */
+  private getCircularLinkType(link: TimelineLink): string | null {
+    let re: string | null = null;
+    if (link.isCircular) {
+      if (link.source.circularLinkType || link.target.circularLinkType) {
+        re = link.source.circularLinkType || link.target.circularLinkType;
+      } else if (this.topLinkCount < this.bottomLinkCount) {
+        re = 'top';
+      } else {
+        re = 'bottom';
+      }
+      if (link.circularLinkType === 'top') {
+        this.topLinkCount += 1;
+      } else {
+        this.bottomLinkCount += 1;
+      }
+    }
+    return re;
   }
 
   /**
