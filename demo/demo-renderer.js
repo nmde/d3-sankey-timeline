@@ -24,7 +24,8 @@ window.renderDemo = function renderDemo(timeline, range) {
     );
 
   // Create nodes
-  const color = '#dddddd';
+  let colorIndex = 0;
+  const color = d3.interpolateSpectral;
   svg
     .append('g')
     .selectAll('rect')
@@ -34,21 +35,10 @@ window.renderDemo = function renderDemo(timeline, range) {
     .attr('y', (d) => d.y)
     .attr('height', (d) => d.height)
     .attr('width', (d) => d.width)
-    .attr('fill', (d) => {
-      let c;
-      /*
-    d.sourceLinks.forEach((link) => {
-      if (c === undefined) c = link.color;
-      else if (c !== link.color) c = null;
-    });
-    if (c === undefined) {
-      d.targetLinks.forEach((link) => {
-        if (c === undefined) c = link.color;
-        else if (c !== link.color) c = null;
-      });
-    }
-    */
-      return (d3.color(c) || d3.color(color)).darker(0.5);
+    .attr('fill', () => {
+      const c = color(colorIndex / graph.nodes.length);
+      colorIndex += 1;
+      return c;
     })
     .append('title')
     .text((d) => `${d.label}\n${d.size}`);
@@ -60,13 +50,15 @@ window.renderDemo = function renderDemo(timeline, range) {
     .selectAll('g')
     .data(graph.links)
     .join('g')
-    .attr('stroke', (d) => d3.color(d.color) || color)
+    .attr('stroke', (d) => d3.color(color(d.source.id / graph.nodes.length)).brighter(0.5))
     .style('mix-blend-mode', 'multiply');
 
   link
     .append('path')
-    .attr('d', sankeyTimeline.sankeyLinkHorizontal())
+    .attr('d', (d) => d.path)
     .attr('stroke-width', (d) => Math.max(1, d.width));
 
-  link.append('title').text((d) => `${d.source.label} → ${d.target.label}\n${d.flow}`);
+  link
+    .append('title')
+    .text((d) => `${d.source.label} → ${d.target.label}\n${d.flow}`);
 };

@@ -187,6 +187,21 @@ export default class SankeyTimeline {
   }
 
   /**
+   * Maximum link flow in the graph.
+   *
+   * @returns The largest flow value in the graph.
+   */
+  public get maxFlow(): number {
+    let maxFlow = 0;
+    Object.values(this.links).forEach((link) => {
+      if (link.flow > maxFlow) {
+        maxFlow = link.flow;
+      }
+    });
+    return maxFlow;
+  }
+
+  /**
    * The maximum time in the graph.
    *
    * @returns The maximum time in the graph.

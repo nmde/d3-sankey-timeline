@@ -2,7 +2,7 @@
 /* global d3, sankeyTimeline */
 
 const timeline = new sankeyTimeline.default();
-const range = [0, window.innerWidth - 10];
+const range = [50, window.innerWidth - 50];
 timeline.setRange(range);
 
 let v0;
@@ -19,7 +19,7 @@ const steps = [
     v1 = timeline.addNode('v1', 2, 4);
   },
   () => {
-    timeline.addLink(v0, v1, 1);
+    timeline.addLink(v0, v1, 12);
   },
   () => {
     v2 = timeline.addNode('v2', 4, 8);
@@ -54,17 +54,30 @@ const steps = [
   () => {
     timeline.addLink(v5, v5, 2);
   },
+  () => {
+    timeline.addLink(v5, v3, 4);
+  },
 ];
 
-steps[0]();
-let currentStep = 1;
-window.renderDemo(timeline, range);
-const interval = setInterval(() => {
-  steps[currentStep]();
-  d3.selectAll('svg > *').remove();
+const animated = false;
+const stepTime = 1000;
+const maxStep = steps.length;
+if (animated) {
+  steps[0]();
+  let currentStep = 1;
   window.renderDemo(timeline, range);
-  currentStep += 1;
-  if (currentStep === steps.length) {
-    clearInterval(interval);
+  const interval = setInterval(() => {
+    steps[currentStep]();
+    d3.selectAll('svg > *').remove();
+    window.renderDemo(timeline, range);
+    currentStep += 1;
+    if (currentStep === maxStep) {
+      clearInterval(interval);
+    }
+  }, stepTime);
+} else {
+  for (let currentStep = 0; currentStep < maxStep; currentStep += 1) {
+    steps[currentStep]();
   }
-}, 1000);
+  window.renderDemo(timeline, range);
+}

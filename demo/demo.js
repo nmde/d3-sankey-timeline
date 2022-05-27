@@ -68,7 +68,7 @@ Object.keys(nodes).forEach((n) => {
 });
 
 console.log(timeline);
-const range = [20, window.innerWidth - 20];
+const range = [200, window.innerWidth - 200];
 timeline.setRange(range);
 
 window.renderDemo(timeline, range);

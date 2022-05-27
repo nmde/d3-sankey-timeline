@@ -176,16 +176,12 @@ export default class TimelineLink {
     if (this.isCircular) {
       return null;
     }
-    const normalPath = linkHorizontal()
-      .source((d0) => {
-        const d = d0 as unknown as TimelineLink;
-        return [d.source.x1, d.y];
-      })
-      .target((d0) => {
-        const d = d0 as unknown as TimelineLink;
-        return [d.target.x, d.y1];
-      })(this as unknown as DefaultLinkObject);
-    return normalPath;
+    const curveModifier = 200;
+    const y = this.source.y + this.source.height / 2;
+    const y1 = this.target.y + this.target.height / 2;
+    return `M${this.source.x1},${y}C${this.source.x1 + curveModifier},${y},${
+      this.target.x - curveModifier
+    },${y1},${this.target.x},${y1}`;
   }
 
   /**
@@ -305,7 +301,7 @@ export default class TimelineLink {
    * @returns The link's width.
    */
   public get width(): number {
-    return 100;
+    return 100 * (this.flow / this.graph.maxFlow);
   }
 
   /**
