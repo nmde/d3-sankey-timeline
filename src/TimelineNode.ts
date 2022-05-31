@@ -6,8 +6,6 @@ import type TimelineLink from './TimelineLink';
  * A node in the timeline.
  */
 export default class TimelineNode {
-  public circularLinkType: string | null = null;
-
   public endTime: number;
 
   public graph: SankeyTimeline;

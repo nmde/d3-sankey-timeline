@@ -84,28 +84,6 @@ export default class TimelineLink {
   }
 
   /**
-   * The approximate overlap range.
-   *
-   * @returns The approximate overlap range.
-   */
-  public get overlapRange(): number[] {
-    if (this.isCircular) {
-      return [0, 0];
-    }
-    const a = [this.source.x1, this.source.y + this.source.height / 2];
-    const b = [this.target.x - 100, this.target.y + this.target.height / 2];
-    const c = [this.source.x1 + 100, this.source.y + this.source.height / 2];
-    const d = [this.target.x, this.target.y + this.target.height / 2];
-    console.log(
-      `(x) => ((${b[1]} - ${a[1]}) / (${a[0]} - ${b[0]})) * x - ${this.source.x1} - ${this.width}`,
-    );
-    console.log(
-      `(x) => ((${d[1]} - ${c[1]}) / (${c[0]} - ${d[0]})) * x - ${this.target.x} - ${this.width}`,
-    );
-    return [];
-  }
-
-  /**
    * Gets the path string for the link.
    *
    * @returns The path string.

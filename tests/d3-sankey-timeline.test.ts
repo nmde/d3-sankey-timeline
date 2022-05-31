@@ -3,13 +3,16 @@ import SankeyTimeline from '../src';
 
 test('main', () => {
   const timeline = new SankeyTimeline();
+  // Need to set before adding nodes so the rows get calculated properly
+  // TODO: make this not the case
+  timeline.setRange([10, 190]);
   const v0 = timeline.addNode('v0', 0, 2);
   const v1 = timeline.addNode('v1', 2, 4);
   const v2 = timeline.addNode('v2', 4, 8);
   const v3 = timeline.addNode('v3', 3, 5);
   const v4 = timeline.addNode('v4', 6, 12);
   const v5 = timeline.addNode('v5', 11, 13);
-  const a = timeline.addLink(v0, v1, 1);
+  const a = timeline.addLink(v0, v1, 12);
   const b = timeline.addLink(v1, v2, 10);
   const c = timeline.addLink(v1, v3, 30);
   const d = timeline.addLink(v2, v4, 4);
@@ -17,7 +20,7 @@ test('main', () => {
   const f = timeline.addLink(v4, v0, 12);
   const g = timeline.addLink(v2, v5, 3);
   const h = timeline.addLink(v5, v5, 2);
-  timeline.setRange([10, 190]);
+  const i = timeline.addLink(v5, v3, 4);
   expect(a.isCircular).toBe(false);
   expect(b.isCircular).toBe(false);
   expect(c.isCircular).toBe(false);
@@ -29,9 +32,9 @@ test('main', () => {
   expect(v0.size).toBe(12);
   expect(v1.size).toBe(40);
   expect(v2.size).toBe(11);
-  expect(v3.size).toBe(30);
+  expect(v3.size).toBe(34);
   expect(v4.size).toBe(12);
-  expect(v5.size).toBe(5);
+  expect(v5.size).toBe(6);
   expect(v0.partOfCircuit).toBe(true);
   expect(v1.partOfCircuit).toBe(false);
   expect(v2.partOfCircuit).toBe(false);
@@ -63,8 +66,6 @@ test('main', () => {
   expect(timeline.maxX).toBeCloseTo(162.308);
   expect(timeline.minY).toBe(0);
   expect(timeline.maxY).toBe(200);
-  expect(f.circularLinkType).toBe('bottom');
-  expect(h.circularLinkType).toBe('top');
   expect(f.isSelfLinking).toBe(false);
   expect(h.isSelfLinking).toBe(true);
   expect(f.isOnlyCircularLink).toBe(true);

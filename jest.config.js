@@ -2,6 +2,7 @@
 module.exports = {
   moduleNameMapper: {
     d3: '<rootDir>/node_modules/d3/dist/d3.min.js',
+    'flo-bezier3': '<rootDir>/node_modules/flo-bezier3/browser/index.min.js',
   },
   preset: 'ts-jest',
   setupFilesAfterEnv: ['./tests/setup.js'],
