@@ -58,6 +58,11 @@ const steps = [
   () => {
     timeline.addLink(v5, v3, 4);
   },
+  () => {
+    Object.values(timeline.nodes).forEach((node) => {
+      timeline.findLinkOverlaps(node);
+    });
+  },
 ];
 
 const animated = true;

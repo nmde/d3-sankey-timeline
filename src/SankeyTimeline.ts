@@ -116,15 +116,20 @@ export default class SankeyTimeline {
    * @returns The overlapping links.
    */
   public findLinkOverlaps(target: TimelineNode): TimelineLink[] {
-    const linkOverlaps: TimelineLink[] = [];
+    const linkOverlaps: number[] = [];
+    console.log(target.label);
     Object.values(this.links).forEach((link) => {
       target.boundingBezierCurves.forEach((curve) => {
-        if (bezierBezierIntersectionFast(curve, link.curve).length > 0) {
-          linkOverlaps.push(link);
+        if (
+          bezierBezierIntersectionFast(curve, link.curve).length > 0 &&
+          linkOverlaps.indexOf(link.id) < 0
+        ) {
+          linkOverlaps.push(link.id);
         }
       });
     });
-    return linkOverlaps;
+    console.log(linkOverlaps);
+    return linkOverlaps.map((id) => this.links[id]);
   }
 
   /**
@@ -172,7 +177,6 @@ export default class SankeyTimeline {
     while (overlapRows.indexOf(minEmptyRow) >= 0) {
       minEmptyRow += 1;
     }
-    this.findLinkOverlaps(node);
     return minEmptyRow;
   }
 

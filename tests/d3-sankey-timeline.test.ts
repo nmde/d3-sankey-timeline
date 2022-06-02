@@ -50,12 +50,30 @@ test('main', () => {
   expect(v4.x).toBeCloseTo(93.077);
   expect(v5.x).toBeCloseTo(162.308);
   expect(v0.width).toBeCloseTo(27.692);
-  expect(timeline.findOverlaps(v0).map((o) => o.label)).toIncludeAllMembers(['v1']);
-  expect(timeline.findOverlaps(v1).map((o) => o.label)).toIncludeAllMembers(['v0', 'v2', 'v3']);
-  expect(timeline.findOverlaps(v2).map((o) => o.label)).toIncludeAllMembers(['v1', 'v3', 'v4']);
-  expect(timeline.findOverlaps(v3).map((o) => o.label)).toIncludeAllMembers(['v1', 'v2']);
-  expect(timeline.findOverlaps(v4).map((o) => o.label)).toIncludeAllMembers(['v2', 'v5']);
-  expect(timeline.findOverlaps(v5).map((o) => o.label)).toIncludeAllMembers(['v4']);
+  expect(timeline.findOverlaps(v0).map((o) => o.label)).toIncludeAllMembers([
+    'v1',
+  ]);
+  expect(timeline.findOverlaps(v1).map((o) => o.label)).toIncludeAllMembers([
+    'v0',
+    'v2',
+    'v3',
+  ]);
+  expect(timeline.findOverlaps(v2).map((o) => o.label)).toIncludeAllMembers([
+    'v1',
+    'v3',
+    'v4',
+  ]);
+  expect(timeline.findOverlaps(v3).map((o) => o.label)).toIncludeAllMembers([
+    'v1',
+    'v2',
+  ]);
+  expect(timeline.findOverlaps(v4).map((o) => o.label)).toIncludeAllMembers([
+    'v2',
+    'v5',
+  ]);
+  expect(timeline.findOverlaps(v5).map((o) => o.label)).toIncludeAllMembers([
+    'v4',
+  ]);
   expect(v0.row).toBe(0);
   expect(v1.row).toBe(1);
   expect(v2.row).toBe(0);
@@ -70,6 +88,12 @@ test('main', () => {
   expect(h.isSelfLinking).toBe(true);
   expect(f.isOnlyCircularLink).toBe(true);
   expect(h.isOnlyCircularLink).toBe(true);
+  expect(
+    timeline.findLinkOverlaps(v0).map((o) => [o.source.label, o.target.label]),
+  ).toIncludeAllMembers([
+    ['v0', 'v1'],
+    ['v4', 'v0'],
+  ]);
 });
 
 test('edge cases', () => {
