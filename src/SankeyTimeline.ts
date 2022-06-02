@@ -1,5 +1,5 @@
 import findCircuits from 'elementary-circuits-directed-graph';
-import { bezierBezierIntersectionFast } from 'flo-bezier3';
+import { bezierBezierIntersectionFast, evalDeCasteljau } from 'flo-bezier3';
 import TimelineLink from './TimelineLink';
 import TimelineNode from './TimelineNode';
 import { TimelineGraph } from './types';
@@ -87,6 +87,27 @@ export default class SankeyTimeline {
   }
 
   /**
+   * Shift graph items around to minimize overlaps.
+   */
+  public adjust(): void {
+    Object.values(this.nodes).forEach((node) => {
+      let maxY = 0;
+      this.findLinkOverlaps(node).intersections.forEach((overlaps) => {
+        overlaps.forEach((curve) => {
+          curve
+            .map((p) => p.map((q) => Number(q.toPrecision(2))))
+            .forEach((point) => {
+              if (point[1] > maxY && point[1] < node.y + node.height / 2) {
+                maxY = point[1];
+              }
+            });
+        });
+      });
+      this.nodes[node.id].netAdjustment.y += maxY;
+    });
+  }
+
+  /**
    * A dynamically constructed adjacency list of the links in the graph.
    *
    * @returns The adjacency list.
@@ -110,26 +131,41 @@ export default class SankeyTimeline {
   }
 
   /**
+   * Clears adjustments made by adjust().
+   */
+  public clearAdjustments(): void {
+    Object.values(this.nodes).forEach((node) => {
+      this.nodes[node.id].netAdjustment.y = 0;
+    });
+  }
+
+  /**
    * Finds links overlapping with the given node.
    *
    * @param target - The node to find overlaps for.
    * @returns The overlapping links.
    */
-  public findLinkOverlaps(target: TimelineNode): TimelineLink[] {
+  public findLinkOverlaps(target: TimelineNode): {
+    intersections: number[][][][];
+    links: TimelineLink[];
+  } {
     const linkOverlaps: number[] = [];
-    console.log(target.label);
+    const intersections: number[][][][] = [];
     Object.values(this.links).forEach((link) => {
       target.boundingBezierCurves.forEach((curve) => {
-        if (
-          bezierBezierIntersectionFast(curve, link.curve).length > 0 &&
-          linkOverlaps.indexOf(link.id) < 0
-        ) {
+        const i = bezierBezierIntersectionFast(curve, link.curve);
+        if (i.length > 0 && linkOverlaps.indexOf(link.id) < 0) {
           linkOverlaps.push(link.id);
+          intersections.push(
+            i.map((j) => j.map((k) => evalDeCasteljau(curve, k))),
+          );
         }
       });
     });
-    console.log(linkOverlaps);
-    return linkOverlaps.map((id) => this.links[id]);
+    return {
+      intersections,
+      links: linkOverlaps.map((id) => this.links[id]),
+    };
   }
 
   /**

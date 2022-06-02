@@ -16,7 +16,10 @@ export default class TimelineNode {
 
   public label: string;
 
-  public netAdjustment = 0;
+  public netAdjustment = {
+    x: 0,
+    y: 0,
+  };
 
   public outgoingLinks: TimelineLink[] = [];
 
@@ -203,7 +206,8 @@ export default class TimelineNode {
     return (
       (this.graph.range[1] - this.graph.range[0]) *
         (this.startTime / (this.graph.maxTime - this.graph.minTime)) +
-      this.graph.range[0]
+      this.graph.range[0] +
+      this.netAdjustment.x
     );
   }
 
@@ -216,7 +220,8 @@ export default class TimelineNode {
     return (
       (this.graph.range[1] - this.graph.range[0]) *
         (this.endTime / (this.graph.maxTime - this.graph.minTime)) +
-      this.graph.range[0]
+      this.graph.range[0] +
+      this.netAdjustment.x
     );
   }
 
@@ -226,7 +231,7 @@ export default class TimelineNode {
    * @returns The Y coordinate.
    */
   public get y(): number {
-    return this.row * this.height;
+    return this.row * this.height + this.netAdjustment.y;
   }
 
   /**
@@ -235,6 +240,6 @@ export default class TimelineNode {
    * @returns The Y bound coordinate.
    */
   public get y1(): number {
-    return this.y + this.height;
+    return this.y + this.height + this.netAdjustment.y;
   }
 }

@@ -25,7 +25,7 @@ window.renderDemo = function renderDemo(timeline, range) {
 
   // Create nodes
   let colorIndex = 0;
-  const color = d3.interpolateRainbow;
+  const color = d3.interpolateHsl(d3.color('purple'), d3.color('orange'));
   svg
     .append('g')
     .selectAll('rect')

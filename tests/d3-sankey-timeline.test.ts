@@ -5,7 +5,7 @@ test('main', () => {
   const timeline = new SankeyTimeline();
   // Need to set before adding nodes so the rows get calculated properly
   // TODO: make this not the case
-  timeline.setRange([10, 190]);
+  timeline.setRange([10, 790]);
   const v0 = timeline.addNode('v0', 0, 2);
   const v1 = timeline.addNode('v1', 2, 4);
   const v2 = timeline.addNode('v2', 4, 8);
@@ -43,13 +43,6 @@ test('main', () => {
   expect(v5.partOfCircuit).toBe(true);
   expect(timeline.minTime).toBe(0);
   expect(timeline.maxTime).toBe(13);
-  expect(v0.x).toBeCloseTo(10);
-  expect(v1.x).toBeCloseTo(37.692);
-  expect(v2.x).toBeCloseTo(65.384);
-  expect(v3.x).toBeCloseTo(51.538);
-  expect(v4.x).toBeCloseTo(93.077);
-  expect(v5.x).toBeCloseTo(162.308);
-  expect(v0.width).toBeCloseTo(27.692);
   expect(timeline.findOverlaps(v0).map((o) => o.label)).toIncludeAllMembers([
     'v1',
   ]);
@@ -80,19 +73,55 @@ test('main', () => {
   expect(v3.row).toBe(2);
   expect(v4.row).toBe(1);
   expect(v5.row).toBe(0);
-  expect(timeline.minX).toBe(10);
-  expect(timeline.maxX).toBeCloseTo(162.308);
-  expect(timeline.minY).toBe(0);
-  expect(timeline.maxY).toBe(200);
   expect(f.isSelfLinking).toBe(false);
   expect(h.isSelfLinking).toBe(true);
   expect(f.isOnlyCircularLink).toBe(true);
   expect(h.isOnlyCircularLink).toBe(true);
   expect(
-    timeline.findLinkOverlaps(v0).map((o) => [o.source.label, o.target.label]),
+    timeline
+      .findLinkOverlaps(v0)
+      .links.map((o) => [o.source.label, o.target.label]),
+  ).toIncludeAllMembers([['v4', 'v0']]);
+  expect(
+    timeline
+      .findLinkOverlaps(v1)
+      .links.map((o) => [o.source.label, o.target.label]),
   ).toIncludeAllMembers([
-    ['v0', 'v1'],
+    ['v1', 'v3'],
+    ['v3', 'v2'],
+  ]);
+  expect(
+    timeline
+      .findLinkOverlaps(v2)
+      .links.map((o) => [o.source.label, o.target.label]),
+  ).toIncludeAllMembers([
     ['v4', 'v0'],
+    ['v2', 'v4'],
+  ]);
+  expect(
+    timeline
+      .findLinkOverlaps(v3)
+      .links.map((o) => [o.source.label, o.target.label]),
+  ).toIncludeAllMembers([
+    ['v1', 'v3'],
+    ['v5', 'v3'],
+  ]);
+  expect(
+    timeline
+      .findLinkOverlaps(v4)
+      .links.map((o) => [o.source.label, o.target.label]),
+  ).toIncludeAllMembers([
+    ['v2', 'v4'],
+    ['v5', 'v3'],
+    ['v4', 'v0'],
+  ]);
+  expect(
+    timeline
+      .findLinkOverlaps(v5)
+      .links.map((o) => [o.source.label, o.target.label]),
+  ).toIncludeAllMembers([
+    ['v5', 'v5'],
+    ['v5', 'v3'],
   ]);
 });
 

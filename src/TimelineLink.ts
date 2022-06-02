@@ -109,7 +109,7 @@ export default class TimelineLink {
    * @returns The link's width.
    */
   public get width(): number {
-    return 1; /* 100 * (this.flow / this.graph.maxFlow); */
+    return 80 * (this.flow / this.graph.maxFlow);
   }
 
   /**

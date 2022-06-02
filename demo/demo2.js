@@ -2,9 +2,14 @@
 /* global d3, sankeyTimeline */
 
 const timeline = new sankeyTimeline.default();
-const margin = 0;
+const margin = 100;
 const range = [margin, window.innerWidth - margin];
 timeline.setRange(range);
+
+const adjust = () => {
+  timeline.clearAdjustments();
+  timeline.adjust();
+};
 
 let v0;
 let v1;
@@ -23,10 +28,16 @@ const steps = [
     timeline.addLink(v0, v1, 12);
   },
   () => {
+    adjust();
+  },
+  () => {
     v2 = timeline.addNode('v2', 4, 8);
   },
   () => {
     timeline.addLink(v1, v2, 10);
+  },
+  () => {
+    adjust();
   },
   () => {
     v3 = timeline.addNode('v3', 3, 5);
@@ -35,16 +46,28 @@ const steps = [
     timeline.addLink(v1, v3, 30);
   },
   () => {
+    adjust();
+  },
+  () => {
     v4 = timeline.addNode('v4', 6, 12);
   },
   () => {
     timeline.addLink(v2, v4, 4);
   },
   () => {
+    adjust();
+  },
+  () => {
     timeline.addLink(v3, v2, 1);
   },
   () => {
+    adjust();
+  },
+  () => {
     timeline.addLink(v4, v0, 12);
+  },
+  () => {
+    adjust();
   },
   () => {
     v5 = timeline.addNode('v5', 11, 13);
@@ -53,20 +76,24 @@ const steps = [
     timeline.addLink(v2, v5, 3);
   },
   () => {
+    adjust();
+  },
+  () => {
     timeline.addLink(v5, v5, 2);
+  },
+  () => {
+    adjust();
   },
   () => {
     timeline.addLink(v5, v3, 4);
   },
   () => {
-    Object.values(timeline.nodes).forEach((node) => {
-      timeline.findLinkOverlaps(node);
-    });
+    adjust();
   },
 ];
 
 const animated = true;
-const stepTime = 100;
+const stepTime = 2000;
 const maxStep = steps.length;
 if (animated) {
   steps[0]();
@@ -85,5 +112,6 @@ if (animated) {
   for (let currentStep = 0; currentStep < maxStep; currentStep += 1) {
     steps[currentStep]();
   }
+  timeline.adjust();
   window.renderDemo(timeline, range);
 }

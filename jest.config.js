@@ -16,4 +16,5 @@ module.exports = {
     '.+\\.jsx?$': 'babel-jest',
     '^.+\\.(ts|tsx)?$': 'ts-jest',
   },
+  transformIgnorePatterns: [],
 };

@@ -3,6 +3,8 @@
 
 const timeline = new sankeyTimeline.default();
 const { data } = window;
+const range = [200, window.innerWidth - 200];
+timeline.setRange(range);
 
 const nodes = {};
 const links = {};
@@ -67,8 +69,5 @@ Object.keys(nodes).forEach((n) => {
   });
 });
 
-console.log(timeline);
-const range = [200, window.innerWidth - 200];
-timeline.setRange(range);
-
+timeline.adjust();
 window.renderDemo(timeline, range);
