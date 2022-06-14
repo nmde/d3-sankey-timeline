@@ -6,6 +6,9 @@ const margin = 100;
 const range = [margin, window.innerWidth - margin];
 timeline.setRange(range);
 
+/**
+ * Adjusts the node positions.
+ */
 const adjust = () => {
   timeline.clearAdjustments();
   timeline.adjust();

@@ -39,9 +39,7 @@ window.renderDemo = function renderDemo(timeline, range) {
       const c = color(colorIndex / graph.nodes.length);
       colorIndex += 1;
       return c;
-    })
-    .append('title')
-    .text((d) => `${d.label}\n${d.size}`);
+    });
 
   // Create links
   const link = svg
@@ -61,4 +59,18 @@ window.renderDemo = function renderDemo(timeline, range) {
   link
     .append('title')
     .text((d) => `${d.source.label} → ${d.target.label}\n${d.flow}`);
+
+  // Create labels
+  svg
+    .append('g')
+    .selectAll('text')
+    .data(graph.nodes)
+    .join('text')
+    .attr('x', (d) => d.x + d.width / 2)
+    .attr('y', (d) => d.y + d.height / 2)
+    .attr('text-anchor', 'middle')
+    .attr('dominant-baseline', 'middle')
+    .style('fill', 'white')
+    .style('font-size', '25px')
+    .text((d) => d.label);
 };
