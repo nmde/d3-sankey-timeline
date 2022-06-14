@@ -1,5 +1,5 @@
 /// <reference types="jest-extended" />
-import SankeyTimeline from '../src';
+import { SankeyTimeline } from '../src';
 
 test('main', () => {
   const timeline = new SankeyTimeline();
@@ -20,7 +20,7 @@ test('main', () => {
   const f = timeline.addLink(v4, v0, 12);
   const g = timeline.addLink(v2, v5, 3);
   const h = timeline.addLink(v5, v5, 2);
-  const i = timeline.addLink(v5, v3, 4);
+  timeline.addLink(v5, v3, 4);
   expect(a.isCircular).toBe(false);
   expect(b.isCircular).toBe(false);
   expect(c.isCircular).toBe(false);
@@ -131,5 +131,5 @@ test('edge cases', () => {
   expect(timeline.minTime).toBe(0);
   timeline.setRange([0, 100]);
   const zeroWidth = timeline.addNode('zeroWidth', 0, 0);
-  expect(zeroWidth.width).toBe(1);
+  expect(zeroWidth.width).toBe(0);
 });

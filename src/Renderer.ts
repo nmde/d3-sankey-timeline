@@ -9,6 +9,13 @@ import SankeyTimeline from './SankeyTimeline';
  * Renders the chart using D3.
  */
 export default class Renderer {
+  public options = {
+    endColor: 'orange',
+    fontColor: 'white',
+    fontSize: 25,
+    startColor: 'purple',
+  };
+
   public timeline: SankeyTimeline;
 
   /**
@@ -48,8 +55,8 @@ export default class Renderer {
     // Create nodes
     let colorIndex = 0;
     const gradient = interpolateHsl(
-      color('purple') as d3.HSLColor,
-      color('orange') as d3.HSLColor,
+      color(this.options.startColor) as d3.HSLColor,
+      color(this.options.endColor) as d3.HSLColor,
     );
     svg
       .append('g')
@@ -74,9 +81,9 @@ export default class Renderer {
       .data(graph.links)
       .join('g')
       .attr('stroke', (d) =>
-        (color(gradient(d.source.id / graph.nodes.length)) as d3.RGBColor)
-          .brighter(0.5)
-          .toString())
+        (
+          color(gradient(d.source.id / graph.nodes.length)) as d3.RGBColor
+        ).toString())
       .style('mix-blend-mode', 'multiply');
 
     link
@@ -98,8 +105,8 @@ export default class Renderer {
       .attr('y', (d) => d.y + d.height / 2)
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'middle')
-      .style('fill', 'white')
-      .style('font-size', '25px')
+      .style('fill', this.options.fontColor)
+      .style('font-size', `${this.options.fontSize}px`)
       .text((d) => d.label);
   }
 }

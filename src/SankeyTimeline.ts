@@ -8,8 +8,6 @@ import { TimelineGraph } from './types';
  * Create and render a Sankey diagram along a timeline.
  */
 export default class SankeyTimeline {
-  private bottomLinkCount = 0;
-
   private keyTimes: number[] = [];
 
   private links: Record<number, TimelineLink> = {};

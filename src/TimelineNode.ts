@@ -191,8 +191,8 @@ export default class TimelineNode {
    */
   public get width(): number {
     const width = this.x1 - this.x;
-    if (width === 0 || Number.isNaN(width)) {
-      return 1;
+    if (Number.isNaN(width)) {
+      return 0;
     }
     return width;
   }
