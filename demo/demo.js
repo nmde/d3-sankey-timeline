@@ -1,7 +1,7 @@
-/* eslint-disable new-cap */
 /* global sankeyTimeline */
 
-const timeline = new sankeyTimeline.default();
+const timeline = new sankeyTimeline.SankeyTimeline();
+const renderer = new sankeyTimeline.Renderer(timeline);
 const { data } = window;
 const range = [200, window.innerWidth - 200];
 timeline.setRange(range);
@@ -70,4 +70,4 @@ Object.keys(nodes).forEach((n) => {
 });
 
 timeline.adjust();
-window.renderDemo(timeline, range);
+renderer.render(timeline, range);

@@ -1,7 +1,7 @@
-/* eslint-disable new-cap */
 /* global d3, sankeyTimeline */
 
-const timeline = new sankeyTimeline.default();
+const timeline = new sankeyTimeline.SankeyTimeline();
+const renderer = new sankeyTimeline.Renderer(timeline);
 const margin = 100;
 const range = [margin, window.innerWidth - margin];
 timeline.setRange(range);
@@ -96,16 +96,16 @@ const steps = [
 ];
 
 const animated = true;
-const stepTime = 2000;
+const stepTime = 300;
 const maxStep = steps.length;
 if (animated) {
   steps[0]();
   let currentStep = 1;
-  window.renderDemo(timeline, range);
+  renderer.render();
   const interval = setInterval(() => {
     steps[currentStep]();
     d3.selectAll('svg > *').remove();
-    window.renderDemo(timeline, range);
+    renderer.render();
     currentStep += 1;
     if (currentStep === maxStep) {
       clearInterval(interval);
@@ -116,5 +116,5 @@ if (animated) {
     steps[currentStep]();
   }
   timeline.adjust();
-  window.renderDemo(timeline, range);
+  renderer.render();
 }

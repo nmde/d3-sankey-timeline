@@ -1,3 +1,4 @@
+import Renderer from './Renderer';
 import SankeyTimeline from './SankeyTimeline';
 
-export default SankeyTimeline;
+export { Renderer, SankeyTimeline };
