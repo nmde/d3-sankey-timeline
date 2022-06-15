@@ -24,7 +24,6 @@ export default class Renderer {
     endColor: 'orange',
     fontColor: 'white',
     fontSize: 25,
-    maxAdjustments: 10,
     maxLinkWidth: 100,
     maxNodeHeight: 100,
     startColor: 'purple',
@@ -128,14 +127,12 @@ export default class Renderer {
     this.preventNodeOverlaps();
     // Calculate initial link positions
     this.calculateLinkPaths();
-    // Adjust until the graph settles
-    let iteration = 0;
-    while (iteration < this.options.maxAdjustments) {
-      this.preventLinkOverlaps();
-      // this.preventNodeOverlaps();
-      // this.calculateLinkPaths();
-      iteration += 1;
-    }
+    // Third pass - Adjust nodes to prevent nodes from overlapping with links
+    this.preventLinkOverlaps();
+    // Then, prevent the new node positions from overlapping with each other
+    this.preventNodeOverlaps();
+    // Finally, recalculate the link paths for the final node coordinates
+    this.calculateLinkPaths();
     return this.graph;
   }
 
@@ -153,6 +150,7 @@ export default class Renderer {
       ];
       const linkOverlaps: number[] = [];
       const intersections: number[][][][] = [];
+      const linkOverlapDirections: number[] = [];
       Object.values(this.graph.links).forEach((link) => {
         [
           [topLeft, topLeft, topRight, topRight],
@@ -161,12 +159,17 @@ export default class Renderer {
           [bottomLeft, bottomLeft, topLeft, topLeft],
         ].forEach((curve) => {
           [
-            link.layout.curve.map((x) => x.map((y) => y - link.layout.width / 2)),
-            link.layout.curve.map((x) => x.map((y) => y + link.layout.width / 2)),
+            link.layout.curve.map((x) =>
+              x.map((y) => y - link.layout.width / 2)),
+            link.layout.curve.map((x) =>
+              x.map((y) => y + link.layout.width / 2)),
           ].forEach((c) => {
             const i = bezierBezierIntersectionFast(curve, c);
             if (i.length > 0 && linkOverlaps.indexOf(link.id) < 0) {
               linkOverlaps.push(link.id);
+              linkOverlapDirections.push(
+                link.source.layout.y - link.target.layout.y,
+              );
               intersections.push(
                 i.map((j) => j.map((k) => evalDeCasteljau(c, k))),
               );
@@ -175,14 +178,17 @@ export default class Renderer {
         });
       });
       let maxY = node.layout.y;
-      console.log(`${node.label} - Previous Y: ${maxY}`);
-      intersections.forEach((overlaps) => {
+      const incomingLinks = node.incomingLinks.map((link) => link.id);
+      intersections.forEach((overlaps, i) => {
         overlaps.forEach((curve) => {
           curve
             .map((p) => p.map((q) => Number(q.toFixed(2))))
             .forEach((point) => {
-              if (point[1] > maxY && point[1] < node.layout.y + node.layout.height / 2) {
-                console.log(point);
+              if (
+                point[1] > maxY &&
+                linkOverlapDirections[i] < 0 &&
+                incomingLinks.indexOf(linkOverlaps[i]) >= 0
+              ) {
                 [, maxY] = point;
               }
             });
@@ -225,7 +231,6 @@ export default class Renderer {
    * Renders the graph.
    */
   public render(): void {
-    /// TODO: Add options to customize the render.
     const graph = this.calculateLayout();
 
     // Create the graph element
