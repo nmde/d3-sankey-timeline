@@ -1,32 +1,35 @@
 import type SankeyTimeline from './SankeyTimeline';
-import TimelineNode from './TimelineNode';
+import type TimelineNode from './TimelineNode';
+import { LinkLayout } from './types';
 
 /**
- * A link between two nodes in the graph.
+ * Represents a link between two nodes in the graph.
  */
 export default class TimelineLink {
-  public circularLinkType: string | null = null;
-
   public flow: number;
 
   public graph: SankeyTimeline;
 
   public id: number;
 
-  public isCircular = false;
+  public layout: LinkLayout = {
+    curve: [],
+    path: '',
+    width: 0,
+  };
 
   public source: TimelineNode;
 
   public target: TimelineNode;
 
   /**
-   * Constructs TimelineLink.
+   * Constructs Timelinelink.
    *
-   * @param graph - The graph that contains this link.
+   * @param graph - The graph that this link belongs to.
    * @param id - The link id.
-   * @param source - The source node id.
-   * @param target - The target node id.
-   * @param flow - The link flow amount.
+   * @param source - The source node.
+   * @param target - The target node.
+   * @param flow - The link flpw.
    */
   public constructor(
     graph: SankeyTimeline,
@@ -43,35 +46,22 @@ export default class TimelineLink {
   }
 
   /**
-   * Gets the bezier curve of the link.
+   * Gets if the link is circular.
    *
-   * @returns The bezier curve.
+   * @returns If the link is circular.
    */
-  public get curve(): number[][] {
-    const curveModifier = 200;
-    const y = this.source.y + this.source.height / 2;
-    const y1 = this.target.y + this.target.height / 2;
-    return [
-      [this.source.x1, y],
-      [this.source.x1 + curveModifier, y],
-      [this.target.x - curveModifier, y1],
-      [this.target.x, y1],
-    ];
-  }
-
-  /**
-   * If the link is the only circular link of its nodes.
-   *
-   * @returns If the link is the only circular link.
-   */
-  public get isOnlyCircularLink(): boolean {
-    let onlyCircularLink = this.isCircular;
-    this.source.links.forEach((link) => {
-      if (link.id !== this.id && link.isCircular) {
-        onlyCircularLink = false;
+  public get isCircular(): boolean {
+    if (this.isSelfLinking) {
+      return true;
+    }
+    let isCircular = false;
+    this.graph.circuits.forEach((circuit) => {
+      const lastLink = circuit.slice(-2);
+      if (lastLink[0] === this.source.id && lastLink[1] === this.target.id) {
+        isCircular = true;
       }
     });
-    return onlyCircularLink;
+    return isCircular;
   }
 
   /**
@@ -81,52 +71,5 @@ export default class TimelineLink {
    */
   public get isSelfLinking(): boolean {
     return this.source.id === this.target.id;
-  }
-
-  /**
-   * Gets the path string for the link.
-   *
-   * @returns The path string.
-   */
-  public get path(): string {
-    if (this.isCircular) {
-      const y = this.source.y + this.source.height / 2;
-      const y1 = this.target.y + this.target.height / 2;
-      const curveHeight = 50;
-      const curveModifier = 200;
-      return `M${this.source.x1 - 5},${y}C${this.source.x1 + curveModifier},${
-        y - curveHeight
-      },${this.target.x - curveModifier},${y1 - curveHeight},${
-        this.target.x + 5
-      },${y1}`;
-    }
-    return `M${this.curve[0][0]},${this.curve[0][1]}C${this.curve[1][0]},${this.curve[1][1]},${this.curve[2][0]},${this.curve[2][1]},${this.curve[3][0]},${this.curve[3][1]}`;
-  }
-
-  /**
-   * Gets the link's width.
-   *
-   * @returns The link's width.
-   */
-  public get width(): number {
-    return 80 * (this.flow / this.graph.maxFlow);
-  }
-
-  /**
-   * Gets the link's start Y coordinate.
-   *
-   * @returns The link's start Y coordinate.
-   */
-  public get y(): number {
-    return this.source.getY(this);
-  }
-
-  /**
-   * Gets the link's end Y coordinate.
-   *
-   * @returns The link's end Y coordinate.
-   */
-  public get y1(): number {
-    return this.target.getY1(this);
   }
 }

@@ -1,18 +1,10 @@
 /* global d3, sankeyTimeline */
 
 const timeline = new sankeyTimeline.SankeyTimeline();
-const renderer = new sankeyTimeline.Renderer(timeline);
 const margin = 100;
 const range = [margin, window.innerWidth - margin];
-timeline.setRange(range);
-
-/**
- * Adjusts the node positions.
- */
-const adjust = () => {
-  timeline.clearAdjustments();
-  timeline.adjust();
-};
+const renderer = new sankeyTimeline.Renderer(timeline, range);
+renderer.options.maxAdjustments = 1;
 
 let v0;
 let v1;
@@ -22,99 +14,72 @@ let v4;
 let v5;
 const steps = [
   () => {
-    v0 = timeline.addNode('v0', 0, 2);
+    v0 = timeline.createNode('v0', 0, 2);
   },
   () => {
-    v1 = timeline.addNode('v1', 2, 4);
+    v1 = timeline.createNode('v1', 2, 4);
   },
   () => {
-    timeline.addLink(v0, v1, 12);
+    timeline.createLink(v0, v1, 12);
   },
   () => {
-    adjust();
+    v2 = timeline.createNode('v2', 4, 8);
   },
   () => {
-    v2 = timeline.addNode('v2', 4, 8);
+    timeline.createLink(v1, v2, 10);
   },
   () => {
-    timeline.addLink(v1, v2, 10);
+    v3 = timeline.createNode('v3', 3, 5);
   },
   () => {
-    adjust();
+    timeline.createLink(v1, v3, 30);
   },
   () => {
-    v3 = timeline.addNode('v3', 3, 5);
+    v4 = timeline.createNode('v4', 6, 12);
   },
   () => {
-    timeline.addLink(v1, v3, 30);
+    timeline.createLink(v2, v4, 4);
   },
   () => {
-    adjust();
+    timeline.createLink(v3, v2, 1);
   },
   () => {
-    v4 = timeline.addNode('v4', 6, 12);
+    timeline.createLink(v4, v0, 12);
   },
   () => {
-    timeline.addLink(v2, v4, 4);
+    v5 = timeline.createNode('v5', 11, 13);
   },
   () => {
-    adjust();
+    timeline.createLink(v2, v5, 3);
   },
   () => {
-    timeline.addLink(v3, v2, 1);
+    timeline.createLink(v5, v5, 2);
   },
   () => {
-    adjust();
-  },
-  () => {
-    timeline.addLink(v4, v0, 12);
-  },
-  () => {
-    adjust();
-  },
-  () => {
-    v5 = timeline.addNode('v5', 11, 13);
-  },
-  () => {
-    timeline.addLink(v2, v5, 3);
-  },
-  () => {
-    adjust();
-  },
-  () => {
-    timeline.addLink(v5, v5, 2);
-  },
-  () => {
-    adjust();
-  },
-  () => {
-    timeline.addLink(v5, v3, 4);
-  },
-  () => {
-    adjust();
+    timeline.createLink(v5, v3, 4);
   },
 ];
 
 const animated = true;
-const stepTime = 300;
-const maxStep = steps.length;
+const stepTime = 500;
+const maxStep = 4;
 if (animated) {
   steps[0]();
   let currentStep = 1;
   renderer.render();
   const interval = setInterval(() => {
+    console.log(`Step ${currentStep}`);
     steps[currentStep]();
     d3.selectAll('svg > *').remove();
     renderer.render();
-    currentStep += 1;
     if (currentStep === maxStep) {
       clearInterval(interval);
     }
+    currentStep += 1;
   }, stepTime);
 } else {
   for (let currentStep = 0; currentStep < maxStep; currentStep += 1) {
     steps[currentStep]();
   }
-  timeline.adjust();
   renderer.render();
 }

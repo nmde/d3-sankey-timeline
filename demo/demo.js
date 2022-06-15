@@ -1,10 +1,9 @@
 /* global sankeyTimeline */
 
 const timeline = new sankeyTimeline.SankeyTimeline();
-const renderer = new sankeyTimeline.Renderer(timeline);
 const { data } = window;
 const range = [200, window.innerWidth - 200];
-timeline.setRange(range);
+const renderer = new sankeyTimeline.Renderer(timeline, range);
 
 const nodes = {};
 const links = {};
@@ -55,7 +54,7 @@ data.keyStates.forEach((keyState) => {
 // Create corresponding nodes timeline.
 Object.keys(nodes).forEach((n) => {
   const node = nodes[n];
-  nodes[n].timelineNode = timeline.addNode(
+  nodes[n].timelineNode = timeline.createNode(
     node.name,
     timestampToSeconds(node.timeMin),
     timestampToSeconds(node.timeMax),
@@ -65,9 +64,8 @@ Object.keys(nodes).forEach((n) => {
 // Now that the TimelineNodes have been created, create links between them.
 Object.keys(nodes).forEach((n) => {
   links[n].forEach((link) => {
-    timeline.addLink(nodes[n].timelineNode, nodes[link].timelineNode, 1);
+    timeline.createLink(nodes[n].timelineNode, nodes[link].timelineNode, 1);
   });
 });
 
-timeline.adjust();
 renderer.render(timeline, range);

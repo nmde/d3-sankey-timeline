@@ -1,6 +1,27 @@
 /// <reference types="jest-extended" />
 import { SankeyTimeline } from '../src';
 
+test('SankeyTimeline', () => {
+  const timeline = new SankeyTimeline();
+
+  const v0 = timeline.createNode('v0', 0, 2);
+  const v1 = timeline.createNode('v1', 2, 4);
+  const v2 = timeline.createNode('v2', 4, 8);
+  const v3 = timeline.createNode('v3', 3, 5);
+  const v4 = timeline.createNode('v4', 6, 12);
+  const v5 = timeline.createNode('v5', 11, 13);
+  const a = timeline.createLink(v0, v1, 12);
+  const b = timeline.createLink(v1, v2, 10);
+  const c = timeline.createLink(v1, v3, 30);
+  const d = timeline.createLink(v2, v4, 4);
+  const e = timeline.createLink(v3, v2, 1);
+  const f = timeline.createLink(v4, v0, 12);
+  const g = timeline.createLink(v2, v5, 3);
+  const h = timeline.createLink(v5, v5, 2);
+  const i = timeline.createLink(v5, v3, 4);
+});
+
+/*
 test('main', () => {
   const timeline = new SankeyTimeline();
   // Need to set before adding nodes so the rows get calculated properly
@@ -133,3 +154,4 @@ test('edge cases', () => {
   const zeroWidth = timeline.addNode('zeroWidth', 0, 0);
   expect(zeroWidth.width).toBe(0);
 });
+*/

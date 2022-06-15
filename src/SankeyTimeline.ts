@@ -1,11 +1,10 @@
 import findCircuits from 'elementary-circuits-directed-graph';
-import { bezierBezierIntersectionFast, evalDeCasteljau } from 'flo-bezier3';
 import TimelineLink from './TimelineLink';
 import TimelineNode from './TimelineNode';
 import { TimelineGraph } from './types';
 
 /**
- * Create and render a Sankey diagram along a timeline.
+ * Creates a Sankey diagram along a timeline.
  */
 export default class SankeyTimeline {
   private keyTimes: number[] = [];
@@ -18,53 +17,66 @@ export default class SankeyTimeline {
 
   private nodes: Record<number, TimelineNode> = {};
 
-  public range: [number, number] = [0, 0];
-
-  private topLinkCount = 0;
-
   /**
-   * Adds a key time.
+   * Adds key times if they don't already exist.
    *
-   * @param time - The key time to add.
+   * @param times - The times to add.
    */
-  private addKeyTime(time: number) {
-    if (this.keyTimes.indexOf(time) < 0) {
-      this.keyTimes.push(time);
-      this.keyTimes.sort((a, b) => a - b);
-    }
+  private addKeyTimes(...times: number[]) {
+    times.forEach((time) => {
+      if (this.keyTimes.indexOf(time) < 0) {
+        this.keyTimes.push(time);
+        this.keyTimes.sort((a, b) => a - b);
+      }
+    });
   }
 
   /**
-   * Adds a link between two nodes.
+   * Creates a link between two nodes.
    *
    * @param source - The source node.
    * @param target - The target node.
    * @param flow - The link flow amount.
    * @returns The created link.
    */
-  public addLink(
-    source: TimelineNode,
-    target: TimelineNode,
-    flow: number,
+  public createLink(
+    source: TimelineNode | number | string,
+    target: TimelineNode | number | string,
+    flow = 0,
   ): TimelineLink {
-    const link = new TimelineLink(this, this.nextLinkId, source, target, flow);
-    source.addOutgoingLink(link);
-    target.addIncomingLink(link);
+    let s: TimelineNode;
+    if (typeof source === 'number') {
+      s = this.nodes[source];
+    } else if (typeof source === 'string') {
+      [s] = this.getNodesByLabel(source);
+    } else {
+      s = source;
+    }
+    let t: TimelineNode;
+    if (typeof target === 'number') {
+      t = this.nodes[target];
+    } else if (typeof target === 'string') {
+      [t] = this.getNodesByLabel(target);
+    } else {
+      t = target;
+    }
+    const link = new TimelineLink(this, this.nextLinkId, s, t, flow);
+    s.addOutgoingLink(link);
+    t.addIncomingLink(link);
     this.links[this.nextLinkId] = link;
-    link.isCircular = this.isCircular(link);
     this.nextLinkId += 1;
     return link;
   }
 
   /**
-   * Adds a node to the timeline.
+   * Creates a new node in the timeline.
    *
    * @param label - The label for the node.
-   * @param startTime - The node start time.
-   * @param endTime - The node end time.
-   * @returns The created node.
+   * @param startTime - The start time in the timeline.
+   * @param endTime - The end time in the timeline.
+   * @returns The created TimelineNode object.
    */
-  public addNode(
+  public createNode(
     label: string,
     startTime: number,
     endTime: number,
@@ -77,40 +89,17 @@ export default class SankeyTimeline {
       endTime,
     );
     this.nodes[this.nextNodeId] = node;
-    this.addKeyTime(startTime);
-    this.addKeyTime(endTime);
-    node.row = this.getRow(node);
+    this.addKeyTimes(startTime, endTime);
     this.nextNodeId += 1;
     return node;
   }
 
   /**
-   * Shift graph items around to minimize overlaps.
-   */
-  public adjust(): void {
-    Object.values(this.nodes).forEach((node) => {
-      let maxY = 0;
-      this.findLinkOverlaps(node).intersections.forEach((overlaps) => {
-        overlaps.forEach((curve) => {
-          curve
-            .map((p) => p.map((q) => Number(q.toPrecision(2))))
-            .forEach((point) => {
-              if (point[1] > maxY && point[1] < node.y + node.height / 2) {
-                maxY = point[1];
-              }
-            });
-        });
-      });
-      this.nodes[node.id].netAdjustment.y += maxY;
-    });
-  }
-
-  /**
-   * A dynamically constructed adjacency list of the links in the graph.
+   * Gets a list of circuits (self-closing loops) in the graph.
    *
-   * @returns The adjacency list.
+   * @returns The circuits in the graph.
    */
-  private get circuits(): number[][] {
+  public get circuits(): number[][] {
     const adjList: number[][] = [];
     Object.values(this.links).forEach((link) => {
       const source = link.source.id;
@@ -129,106 +118,25 @@ export default class SankeyTimeline {
   }
 
   /**
-   * Clears adjustments made by adjust().
+   * Returns all nodes with the given label.
+   *
+   * @param label - The label of nodes to find.
+   * @returns The nodes with the given label, if any.
    */
-  public clearAdjustments(): void {
-    Object.values(this.nodes).forEach((node) => {
-      this.nodes[node.id].netAdjustment.y = 0;
-    });
+  public getNodesByLabel(label: string): TimelineNode[] {
+    return Object.values(this.nodes).filter((node) => node.label === label);
   }
 
   /**
-   * Finds links overlapping with the given node.
+   * Gets an object containing the nodes and links in the graph.
    *
-   * @param target - The node to find overlaps for.
-   * @returns The overlapping links.
+   * @returns The graph object.
    */
-  public findLinkOverlaps(target: TimelineNode): {
-    intersections: number[][][][];
-    links: TimelineLink[];
-  } {
-    const linkOverlaps: number[] = [];
-    const intersections: number[][][][] = [];
-    Object.values(this.links).forEach((link) => {
-      target.boundingBezierCurves.forEach((curve) => {
-        const i = bezierBezierIntersectionFast(curve, link.curve);
-        if (i.length > 0 && linkOverlaps.indexOf(link.id) < 0) {
-          linkOverlaps.push(link.id);
-          intersections.push(
-            i.map((j) => j.map((k) => evalDeCasteljau(curve, k))),
-          );
-        }
-      });
-    });
-    return {
-      intersections,
-      links: linkOverlaps.map((id) => this.links[id]),
-    };
-  }
-
-  /**
-   * Finds nodes overlapping with the given node.
-   *
-   * @param target - The node to find overlaps for.
-   * @returns Overlapping nodes, if any.
-   */
-  public findOverlaps(target: TimelineNode): TimelineNode[] {
-    const overlaps: TimelineNode[] = [];
-    Object.values(this.nodes).forEach((node) => {
-      if (target.id !== node.id) {
-        if (
-          (target.x1 >= node.x && target.x <= node.x) ||
-          (node.x1 >= target.x && node.x <= target.x)
-        ) {
-          overlaps.push(node);
-        }
-      }
-    });
-    return overlaps;
-  }
-
-  /**
-   * Gets the d3 graph.
-   *
-   * @returns The d3 graph object.
-   */
-  public getGraph(): TimelineGraph {
+  public get graph(): TimelineGraph {
     return {
       links: Object.values(this.links),
       nodes: Object.values(this.nodes),
     };
-  }
-
-  /**
-   * Finds the row for a node.
-   *
-   * @param node - The node to find the row for.
-   * @returns The node's row.
-   */
-  private getRow(node: TimelineNode) {
-    const overlapRows = this.findOverlaps(node).map((o) => o.row);
-    let minEmptyRow = 0;
-    while (overlapRows.indexOf(minEmptyRow) >= 0) {
-      minEmptyRow += 1;
-    }
-    return minEmptyRow;
-  }
-
-  /**
-   * Determines if a link is the final link in a circuit.
-   *
-   * @param link - The link to check.
-   * @returns If the link is circular.
-   */
-  private isCircular(link: TimelineLink): boolean {
-    let isCircular = link.target.id === link.source.id;
-    this.circuits.forEach((circuit) => {
-      const lastLink = circuit.slice(-2);
-      if (lastLink[0] === link.source.id && lastLink[1] === link.target.id) {
-        isCircular = true;
-      }
-    });
-    return isCircular;
   }
 
   /**
@@ -247,9 +155,24 @@ export default class SankeyTimeline {
   }
 
   /**
-   * The maximum time in the graph.
+   * Maximum node size in the graph.
    *
-   * @returns The maximum time in the graph.
+   * @returns The maximum node size in the graph.
+   */
+  public get maxSize(): number {
+    let maxSize = 0;
+    Object.values(this.nodes).forEach((node) => {
+      if (node.size > maxSize) {
+        maxSize = node.size;
+      }
+    });
+    return maxSize;
+  }
+
+  /**
+   * Gets the maximum key time in the graph.
+   *
+   * @returns The maximum key time in the graph.
    */
   public get maxTime(): number {
     if (this.keyTimes.length > 0) {
@@ -259,83 +182,14 @@ export default class SankeyTimeline {
   }
 
   /**
-   * Gets the largest X value in the graph.
+   * Gets the smallest key time in the graph.
    *
-   * @returns The largest X value in the graph.
-   */
-  public get maxX(): number {
-    let maxX = 0;
-    Object.values(this.nodes).forEach((node) => {
-      if (node.x > maxX) {
-        maxX = node.x;
-      }
-    });
-    return maxX;
-  }
-
-  /**
-   * Gets the largest Y value in the graph.
-   *
-   * @returns The largest Y value in the graph.
-   */
-  public get maxY(): number {
-    let maxY = 0;
-    Object.values(this.nodes).forEach((node) => {
-      if (node.y > maxY) {
-        maxY = node.y;
-      }
-    });
-    return maxY;
-  }
-
-  /**
-   * The minimum time in the graph.
-   *
-   * @returns The minimum time in the graph.
+   * @returns The smallest key time in the graph.
    */
   public get minTime(): number {
     if (this.keyTimes.length > 0) {
       return this.keyTimes[0];
     }
     return 0;
-  }
-
-  /**
-   * Gets the smallest X value in the graph.
-   *
-   * @returns The smallest X value in the graph.
-   */
-  public get minX(): number {
-    let minX = Infinity;
-    Object.values(this.nodes).forEach((node) => {
-      if (node.x < minX) {
-        minX = node.x;
-      }
-    });
-    return minX;
-  }
-
-  /**
-   * Gets the smallest Y value in the graph.
-   *
-   * @returns The smallest Y value in the graph.
-   */
-  public get minY(): number {
-    let minY = Infinity;
-    Object.values(this.nodes).forEach((node) => {
-      if (node.y < minY) {
-        minY = node.y;
-      }
-    });
-    return minY;
-  }
-
-  /**
-   * Sets the graph's range dimensions.
-   *
-   * @param range - The range.
-   */
-  public setRange(range: [number, number]): void {
-    this.range = range;
   }
 }

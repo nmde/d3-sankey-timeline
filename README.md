@@ -1,7 +1,7 @@
 # d3-sankey-timeline
 Create Sankey diagrams scaled along a timeline.
 
-Some of this code is adapted from [d3-sankey-circular](https://github.com/tomshanley/d3-sankey-circular). 
+Some of this code takes inspiration from [d3-sankey-circular](https://github.com/tomshanley/d3-sankey-circular).
 
 ## Features
 - Object-oriented Sankey diagram creation.
