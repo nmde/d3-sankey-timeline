@@ -8,6 +8,7 @@ renderer.options.maxLinkWidth = 50;
 renderer.options.dynamicLinkWidth = true;
 renderer.options.curveWidth = 100;
 renderer.options.distHandleWidth = 3;
+renderer.options.debug = true;
 
 let v0;
 let v1;

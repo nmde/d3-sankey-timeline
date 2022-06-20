@@ -5,6 +5,7 @@ import { scaleLinear } from 'd3-scale';
 import { select } from 'd3-selection';
 import { bezierBezierIntersectionFast, evalDeCasteljau } from 'flo-bezier3';
 import SankeyTimeline from './SankeyTimeline';
+import TimelineNode from './TimelineNode';
 import type { TimelineGraph } from './types';
 import { getKeyTimes, hasDist } from './util';
 
@@ -157,78 +158,75 @@ export default class Renderer {
   }
 
   /**
+   * Calculates the points at which links cross into nodes.
+   *
+   * @param node - The node to find overlaps for.
+   * @returns The intersecting points.
+   */
+  private findLinkOverlaps(node: TimelineNode) {
+    const topLeft = [node.layout.x, node.layout.y];
+    const topRight = [node.layout.x + node.layout.width, node.layout.y];
+    const bottomLeft = [node.layout.x, node.layout.y + node.layout.height];
+    const bottomRight = [
+      node.layout.x + node.layout.width,
+      node.layout.y + node.layout.height,
+    ];
+    const linkOverlaps: number[] = [];
+    const intersections: number[][][][] = [];
+    Object.values(this.graph.links)
+      // TODO: handle self linking?
+      .filter((link) => !link.isSelfLinking)
+      .forEach((link) => {
+        [
+          [topLeft, topLeft, topRight, topRight],
+          [topRight, topRight, bottomRight, bottomRight],
+          [bottomRight, bottomRight, bottomLeft, bottomLeft],
+          [bottomLeft, bottomLeft, topLeft, topLeft],
+        ].forEach((curve) => {
+          [
+            link.layout.curve.map((x) =>
+              x.map((y) => y - link.layout.width / 2),
+            ),
+            link.layout.curve.map((x) =>
+              x.map((y) => y + link.layout.width / 2),
+            ),
+          ].forEach((c) => {
+            const i = bezierBezierIntersectionFast(curve, c);
+            if (i.length > 0 && linkOverlaps.indexOf(link.id) < 0) {
+              linkOverlaps.push(link.id);
+              intersections.push(
+                i.map((j) => j.map((k) => evalDeCasteljau(c, k))),
+              );
+            }
+          });
+        });
+      });
+    return intersections;
+  }
+
+  /**
    * Adjusts nodes to prevent overlaps between nodes and links.
    */
   private preventLinkOverlaps() {
     this.graph.nodes.forEach((node, n) => {
-      const topLeft = [node.layout.x, node.layout.y];
-      const topRight = [node.layout.x + node.layout.width, node.layout.y];
-      const bottomLeft = [node.layout.x, node.layout.y + node.layout.height];
-      const bottomRight = [
-        node.layout.x + node.layout.width,
-        node.layout.y + node.layout.height,
-      ];
-      const linkOverlaps: number[] = [];
-      const intersections: number[][][][] = [];
-      const linkOverlapDirections: number[] = [];
-      Object.values(this.graph.links)
-        // TODO: handle self linking?
-        .filter((link) => !link.isSelfLinking)
-        .forEach((link) => {
-          [
-            [topLeft, topLeft, topRight, topRight],
-            [topRight, topRight, bottomRight, bottomRight],
-            [bottomRight, bottomRight, bottomLeft, bottomLeft],
-            [bottomLeft, bottomLeft, topLeft, topLeft],
-          ].forEach((curve) => {
-            [
-              link.layout.curve.map((x) =>
-                x.map((y) => y - link.layout.width / 2),
-              ),
-              link.layout.curve.map((x) =>
-                x.map((y) => y + link.layout.width / 2),
-              ),
-            ].forEach((c) => {
-              const i = bezierBezierIntersectionFast(curve, c);
-              if (i.length > 0 && linkOverlaps.indexOf(link.id) < 0) {
-                linkOverlaps.push(link.id);
-                let direction = 1;
-                if (
-                  link.source.layout.x + link.source.layout.width >=
-                  link.target.layout.x
-                ) {
-                  direction = -1;
-                }
-                linkOverlapDirections.push(direction);
-                intersections.push(
-                  i.map((j) => j.map((k) => evalDeCasteljau(c, k))),
-                );
-              }
-            });
-          });
-        });
       let shiftUp = 0;
       let shiftDown = 0;
-      intersections.forEach((overlaps, i) => {
+      this.findLinkOverlaps(node).forEach((overlaps) => {
         overlaps.forEach((curve) => {
           curve
             .map((p) => p.map((q) => Number(q.toFixed(2))))
             .forEach((point) => {
-              if (linkOverlapDirections[i] < 0) {
-                if (
-                  point[1] < node.layout.y + node.layout.height / 2 &&
-                  point[1] > shiftUp
-                ) {
-                  [, shiftUp] = point;
-                } else if (
-                  point[1] > node.layout.y + node.layout.height / 2 &&
-                  point[1] > shiftDown
-                ) {
-                  [, shiftDown] = point;
-                } else {
-                  // console.log(point);
-                }
-              } else if (point[1] > shiftUp) {
+              if (
+                point[1] < node.layout.y + node.layout.height / 2 &&
+                point[1] > shiftUp
+              ) {
+                [, shiftUp] = point;
+              } else if (
+                point[1] > node.layout.y + node.layout.height / 2 &&
+                point[1] > shiftDown
+              ) {
+                [, shiftDown] = point;
+              } else {
                 // console.log(point);
               }
             });
