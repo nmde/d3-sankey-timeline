@@ -5,7 +5,7 @@ const margin = 100;
 const range = [margin, window.innerWidth - margin];
 const renderer = new sankeyTimeline.Renderer(timeline, range);
 renderer.options.maxLinkWidth = 50;
-renderer.options.dynamicLinkWidth = true;
+renderer.options.dynamicLinkWidth = false;
 renderer.options.curveWidth = 100;
 
 let v0;
@@ -46,7 +46,7 @@ const steps = [
     timeline.createLink(v3, v2, 1);
   },
   () => {
-    // timeline.createLink(v4, v0, 12);
+    timeline.createLink(v4, v0, 12);
   },
   () => {
     v5 = timeline.createNode('v5', 11, 13);
@@ -64,7 +64,7 @@ const steps = [
 
 const animated = false;
 const stepTime = 1000;
-const maxStep = steps.length;
+const maxStep = steps.length - 1;
 if (animated) {
   steps[0]();
   let currentStep = 1;

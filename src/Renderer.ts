@@ -63,7 +63,7 @@ export default class Renderer {
         [link.target.layout.x, y1],
       ];
       let path;
-      if (link.isCircular) {
+      if (link.isSelfLinking) {
         path = `M${link.source.layout.x + link.source.layout.width - 5},${y}C${
           link.source.layout.x +
           link.source.layout.width +
@@ -129,10 +129,6 @@ export default class Renderer {
     this.calculateLinkPaths();
     // Third pass - Adjust nodes to prevent nodes from overlapping with links
     this.preventLinkOverlaps();
-    // Then, prevent the new node positions from overlapping with each other
-    this.preventNodeOverlaps();
-    // Finally, recalculate the link paths for the final node coordinates
-    this.calculateLinkPaths();
     return this.graph;
   }
 
@@ -195,6 +191,8 @@ export default class Renderer {
         });
       });
       this.graph.nodes[n].layout.y = maxY;
+      this.preventNodeOverlaps();
+      this.calculateLinkPaths();
     });
   }
 
