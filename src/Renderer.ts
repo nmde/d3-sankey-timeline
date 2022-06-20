@@ -1,5 +1,5 @@
 import { axisBottom } from 'd3-axis';
-import { color } from 'd3-color';
+import { color, HSLColor, RGBColor } from 'd3-color';
 import { interpolateHsl } from 'd3-interpolate';
 import { scaleLinear } from 'd3-scale';
 import { select } from 'd3-selection';
@@ -254,8 +254,8 @@ export default class Renderer {
     // Create nodes
     let colorIndex = 0;
     const gradient = interpolateHsl(
-      color(this.options.startColor) as d3.HSLColor,
-      color(this.options.endColor) as d3.HSLColor,
+      color(this.options.startColor) as HSLColor,
+      color(this.options.endColor) as HSLColor,
     );
     svg
       .append('g')
@@ -281,7 +281,7 @@ export default class Renderer {
       .join('g')
       .attr('stroke', (d) =>
         (
-          color(gradient(d.source.id / graph.nodes.length)) as d3.RGBColor
+          color(gradient(d.source.id / graph.nodes.length)) as RGBColor
         ).toString())
       .style('mix-blend-mode', 'multiply');
 
