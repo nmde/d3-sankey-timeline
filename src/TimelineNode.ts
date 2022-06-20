@@ -3,6 +3,21 @@ import type TimelineLink from './TimelineLink';
 import { NodeLayout } from './types';
 
 /**
+ * Gets the sum of passing each element in the array to the given function.
+ * 
+ * @param arr - The array to sum.
+ * @param fn - The value function.
+ * @returns The sum of the values of items in the array.
+ */
+function sum<T>(arr: T[], fn: (link: T) => number): number {
+  let s = 0;
+  arr.forEach((value) => {
+    s += fn(value);
+  });
+  return s;
+}
+
+/**
  * Represents a node in the timeline.
  */
 export default class TimelineNode {
@@ -92,12 +107,4 @@ export default class TimelineNode {
       sum(this.outgoingLinks, (link) => link.flow),
     );
   }
-}
-
-function sum<T>(arr: T[], fn: (link: T) => number): number {
-  let sum = 0;
-  arr.forEach((value) => {
-    sum += fn(value);
-  });
-  return sum;
 }
