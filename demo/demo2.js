@@ -7,6 +7,7 @@ const renderer = new sankeyTimeline.Renderer(timeline, range);
 renderer.options.maxLinkWidth = 50;
 renderer.options.dynamicLinkWidth = true;
 renderer.options.curveWidth = 100;
+renderer.options.distHandleWidth = 3;
 
 let v0;
 let v1;
@@ -62,7 +63,7 @@ const steps = [
   },
 ];
 
-const animated = true;
+const animated = false;
 const stepTime = 1000;
 const maxStep = steps.length - 1;
 if (animated) {
