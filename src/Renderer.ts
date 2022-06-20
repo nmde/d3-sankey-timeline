@@ -182,12 +182,14 @@ export default class Renderer {
           [bottomRight, bottomRight, bottomLeft, bottomLeft],
         ].forEach((boxCurve) => {
           [
-            link.layout.curve.map((x) =>
-              x.map((y) => y - link.layout.width / 2),
-            ),
-            link.layout.curve.map((x) =>
-              x.map((y) => y + link.layout.width / 2),
-            ),
+            link.layout.curve.map((point) => [
+              point[0] - link.layout.width / 2,
+              point[1],
+            ]),
+            link.layout.curve.map((point) => [
+              point[0] + link.layout.width / 2,
+              point[1],
+            ]),
           ].forEach((linkCurve) => {
             const i = bezierBezierIntersectionFast(boxCurve, linkCurve);
             if (i.length > 0 && linkOverlaps.indexOf(link.id) < 0) {
@@ -214,16 +216,10 @@ export default class Renderer {
           curve
             .map((p) => p.map((q) => Number(q.toFixed(2))))
             .forEach((point) => {
-              if (
-                point[1] < node.layout.y + node.layout.height / 2 &&
-                point[1] > shiftUp
-              ) {
-                [, shiftUp] = point;
-              } else if (
-                point[1] > node.layout.y + node.layout.height / 2 &&
-                point[1] > shiftDown
-              ) {
-                [, shiftDown] = point;
+              if (point[1] < node.layout.y + node.layout.height / 2) {
+                shiftUp += node.layout.y + node.layout.height / 2 - point[1];
+              } else if (point[1] > node.layout.y + node.layout.height / 2) {
+                shiftDown += node.layout.y + node.layout.height / 2 + point[1];
               } else {
                 // console.log(point);
               }
