@@ -6,6 +6,7 @@ import { select } from 'd3-selection';
 import { bezierBezierIntersectionFast, evalDeCasteljau } from 'flo-bezier3';
 import SankeyTimeline from './SankeyTimeline';
 import type { TimelineGraph } from './types';
+import { getKeyTimes, hasDist } from './util';
 
 /**
  * Renders the chart using D3.
@@ -21,6 +22,8 @@ export default class Renderer {
   public options = {
     curveHeight: 50,
     curveWidth: 200,
+    distHandleWidth: 5,
+    distributions: true,
     dynamicLinkWidth: true,
     dynamicNodeHeight: false,
     endColor: 'orange',
@@ -102,16 +105,14 @@ export default class Renderer {
     this.graph = this.timeline.graph;
     this.minY = 0;
     // First pass - initial placements based only on instrinsic properties
+    // TODO - save x1 in layout
     this.graph.nodes.forEach((node, n) => {
-      const x =
-        (this.range[1] - this.range[0]) *
-          (node.startTime / (this.timeline.maxTime - this.timeline.minTime)) +
-        this.range[0];
-      let width =
-        (this.range[1] - this.range[0]) *
-          (node.endTime / (this.timeline.maxTime - this.timeline.minTime)) +
-        this.range[0] -
-        x;
+      let keyTimes = [node.times.startTime, node.times.endTime];
+      if (this.options.distributions) {
+        keyTimes = getKeyTimes(node.times);
+      }
+      const x = this.getTimeX(keyTimes[0]);
+      let width = this.getTimeX(keyTimes[1]) - x;
       if (Number.isNaN(width)) {
         width = 0;
       }
@@ -134,9 +135,21 @@ export default class Renderer {
     this.preventLinkOverlaps();
     // Prevent overlaps with the new positions
     this.preventNodeOverlaps();
-    // Scale everything to fit the window
+    // Fourth pass - Scale everything to fit the window, add in distribution elements
     this.graph.nodes.forEach((node) => {
       node.layout.y += -1 * this.minY;
+      if (hasDist(node.times) && this.options.distributions) {
+        node.layout.distribution = [
+          {
+            x: this.getTimeX(node.times.startTime),
+            y: node.layout.y,
+          },
+          {
+            x: this.getTimeX(node.times.endTime),
+            y: node.layout.y,
+          },
+        ];
+      }
     });
     // Calculate final link positions
     this.calculateLinkPaths();
@@ -196,12 +209,7 @@ export default class Renderer {
         });
       let shiftUp = 0;
       let shiftDown = 0;
-      console.log(node.label);
-      console.log(`${shiftDown}, ${shiftUp}`);
       intersections.forEach((overlaps, i) => {
-        console.log(
-          `${JSON.stringify(overlaps)} - ${linkOverlapDirections[i]}`,
-        );
         overlaps.forEach((curve) => {
           curve
             .map((p) => p.map((q) => Number(q.toFixed(2))))
@@ -218,15 +226,14 @@ export default class Renderer {
                 ) {
                   [, shiftDown] = point;
                 } else {
-                  console.log(point);
+                  // console.log(point);
                 }
               } else if (point[1] > shiftUp) {
-                console.log(point);
+                // console.log(point);
               }
             });
         });
       });
-      console.log(`${shiftDown}, ${shiftUp}`);
       this.graph.nodes[n].layout.y += shiftUp - shiftDown;
     });
   }
@@ -288,7 +295,6 @@ export default class Renderer {
       );
 
     // Create nodes
-    let colorIndex = 0;
     const gradient = interpolateHsl(
       color(this.options.startColor) as HSLColor,
       color(this.options.endColor) as HSLColor,
@@ -302,11 +308,7 @@ export default class Renderer {
       .attr('y', (d) => d.layout.y)
       .attr('height', (d) => d.layout.height)
       .attr('width', (d) => d.layout.width)
-      .attr('fill', () => {
-        const c = gradient(colorIndex / graph.nodes.length);
-        colorIndex += 1;
-        return c;
-      });
+      .attr('fill', (d) => gradient(d.id / graph.nodes.length));
 
     // Create links
     const link = svg
@@ -331,6 +333,74 @@ export default class Renderer {
       .append('title')
       .text((d) => `${d.source.label} → ${d.target.label}\n${d.flow}`);
 
+    // Distribution handles
+    const handleLayer = svg
+      .append('g')
+      .selectAll('rect')
+      .data(
+        graph.nodes.filter((node) => node.layout.distribution !== undefined),
+      )
+      .enter();
+    // Left handle
+    handleLayer
+      .append('rect')
+      .attr('x', (d) => {
+        if (d.layout.distribution) {
+          return d.layout.distribution[0].x;
+        }
+        return 0;
+      })
+      .attr('y', (d) => {
+        if (d.layout.distribution) {
+          return d.layout.distribution[0].y;
+        }
+        return 0;
+      })
+      .attr('height', (d) => d.layout.height)
+      .attr('width', () => this.options.distHandleWidth)
+      .attr('fill', (d) => gradient(d.id / graph.nodes.length));
+    // Right handle
+    handleLayer
+      .append('rect')
+      .attr('x', (d) => {
+        if (d.layout.distribution) {
+          return d.layout.distribution[1].x;
+        }
+        return 0;
+      })
+      .attr('y', (d) => {
+        if (d.layout.distribution) {
+          return d.layout.distribution[1].y;
+        }
+        return 0;
+      })
+      .attr('height', (d) => d.layout.height)
+      .attr('width', () => this.options.distHandleWidth)
+      .attr('fill', (d) => gradient(d.id / graph.nodes.length));
+    // Center line
+    handleLayer
+      .append('rect')
+      .attr('x', (d) => {
+        if (d.layout.distribution) {
+          return d.layout.distribution[0].x;
+        }
+        return 0;
+      })
+      .attr('y', (d) => {
+        if (d.layout.distribution) {
+          return d.layout.y + d.layout.height / 2;
+        }
+        return 0;
+      })
+      .attr('height', () => this.options.distHandleWidth)
+      .attr('width', (d) => {
+        if (d.layout.distribution) {
+          return d.layout.distribution[1].x - d.layout.distribution[0].x;
+        }
+        return 0;
+      })
+      .attr('fill', (d) => gradient(d.id / graph.nodes.length));
+
     // Create labels
     svg
       .append('g')
@@ -344,5 +414,19 @@ export default class Renderer {
       .style('fill', this.options.fontColor)
       .style('font-size', `${this.options.fontSize}px`)
       .text((d) => d.label);
+  }
+
+  /**
+   * Scales the given time value to the range specified in options.
+   *
+   * @param time - The original x coordinate.
+   * @returns - The scaled x coordinate.
+   */
+  private getTimeX(time: number): number {
+    return (
+      (this.range[1] - this.range[0]) *
+        (time / (this.timeline.maxTime - this.timeline.minTime)) +
+      this.range[0]
+    );
   }
 }

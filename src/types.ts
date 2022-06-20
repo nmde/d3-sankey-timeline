@@ -6,15 +6,25 @@ export interface TimelineGraph {
   nodes: TimelineNode[];
 }
 
-export interface NodeLayout {
-  height: number;
-  width: number;
+export interface Coordinate {
   x: number;
   y: number;
+}
+
+export interface NodeLayout extends Coordinate {
+  distribution?: Coordinate[];
+  height: number;
+  width: number;
 }
 
 export interface LinkLayout {
   curve: number[][];
   path: string;
   width: number;
+}
+export interface NodeTimes {
+  endTime: number;
+  meanTime?: number;
+  startTime: number;
+  stdDeviation?: number;
 }

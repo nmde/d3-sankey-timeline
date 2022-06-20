@@ -1,28 +1,12 @@
 import type SankeyTimeline from './SankeyTimeline';
 import type TimelineLink from './TimelineLink';
-import { NodeLayout } from './types';
-
-/**
- * Gets the sum of passing each element in the array to the given function.
- * 
- * @param arr - The array to sum.
- * @param fn - The value function.
- * @returns The sum of the values of items in the array.
- */
-function sum<T>(arr: T[], fn: (link: T) => number): number {
-  let s = 0;
-  arr.forEach((value) => {
-    s += fn(value);
-  });
-  return s;
-}
+import { NodeLayout, NodeTimes } from './types';
+import { sum } from './util';
 
 /**
  * Represents a node in the timeline.
  */
 export default class TimelineNode {
-  public endTime: number;
-
   public graph: SankeyTimeline;
 
   public id: number;
@@ -40,7 +24,7 @@ export default class TimelineNode {
 
   public outgoingLinks: TimelineLink[] = [];
 
-  public startTime: number;
+  public times: NodeTimes;
 
   /**
    * Constructs TimelineNode.
@@ -48,21 +32,18 @@ export default class TimelineNode {
    * @param graph - The containing graph.
    * @param id - The node's id.
    * @param label - The node's label.
-   * @param startTime - The node's starting time.
-   * @param endTime - The node's ending time.
+   * @param times - Node timing data (either start + end time or median + std deviation).
    */
   public constructor(
     graph: SankeyTimeline,
     id: number,
     label: string,
-    startTime: number,
-    endTime: number,
+    times: NodeTimes,
   ) {
     this.graph = graph;
     this.id = id;
     this.label = label;
-    this.startTime = startTime;
-    this.endTime = endTime;
+    this.times = times;
   }
 
   /**

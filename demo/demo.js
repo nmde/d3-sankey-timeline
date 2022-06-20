@@ -4,6 +4,9 @@ const timeline = new sankeyTimeline.SankeyTimeline();
 const { data } = window;
 const range = [200, window.innerWidth - 200];
 const renderer = new sankeyTimeline.Renderer(timeline, range);
+renderer.options.dynamicLinkWidth = true;
+renderer.options.distributions = true;
+renderer.options.maxLinkWidth = 50;
 
 const nodes = {};
 const links = {};
@@ -33,8 +36,13 @@ function processPath(path, paths) {
     links[path.name] = [];
   }
   path.exits.forEach((exitPath) => {
-    if (links[path.name].indexOf(exitPath.otherState) < 0) {
-      links[path.name].push(exitPath.otherState);
+    if (
+      links[path.name].map((link) => link.name).indexOf(exitPath.otherState) < 0
+    ) {
+      links[path.name].push({
+        count: exitPath.cnt,
+        name: exitPath.otherState,
+      });
     }
     processPath(
       paths.find((p) => p.name === exitPath.otherState),
@@ -54,17 +62,22 @@ data.keyStates.forEach((keyState) => {
 // Create corresponding nodes timeline.
 Object.keys(nodes).forEach((n) => {
   const node = nodes[n];
-  nodes[n].timelineNode = timeline.createNode(
-    node.name,
-    timestampToSeconds(node.timeMin),
-    timestampToSeconds(node.timeMax),
-  );
+  nodes[n].timelineNode = timeline.createNode(node.name, {
+    endTime: timestampToSeconds(node.timeMax),
+    meanTime: timestampToSeconds(node.timeMean),
+    startTime: timestampToSeconds(node.timeMin),
+    stdDeviation: timestampToSeconds(node.timeStdDeviation),
+  });
 });
 
 // Now that the TimelineNodes have been created, create links between them.
 Object.keys(nodes).forEach((n) => {
   links[n].forEach((link) => {
-    timeline.createLink(nodes[n].timelineNode, nodes[link].timelineNode, 1);
+    timeline.createLink(
+      nodes[n].timelineNode,
+      nodes[link.name].timelineNode,
+      link.count,
+    );
   });
 });
 

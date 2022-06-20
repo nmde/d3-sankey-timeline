@@ -1,7 +1,11 @@
 import findCircuits from 'elementary-circuits-directed-graph';
 import TimelineLink from './TimelineLink';
 import TimelineNode from './TimelineNode';
-import { TimelineGraph } from './types';
+import {
+  NodeTimes,
+  TimelineGraph,
+} from './types';
+import { getKeyTimes } from './util';
 
 /**
  * Creates a Sankey diagram along a timeline.
@@ -72,24 +76,13 @@ export default class SankeyTimeline {
    * Creates a new node in the timeline.
    *
    * @param label - The label for the node.
-   * @param startTime - The start time in the timeline.
-   * @param endTime - The end time in the timeline.
+   * @param times - Node timing data (either start + end time or median + std deviation).
    * @returns The created TimelineNode object.
    */
-  public createNode(
-    label: string,
-    startTime: number,
-    endTime: number,
-  ): TimelineNode {
-    const node = new TimelineNode(
-      this,
-      this.nextNodeId,
-      label,
-      startTime,
-      endTime,
-    );
+  public createNode(label: string, times: NodeTimes): TimelineNode {
+    const node = new TimelineNode(this, this.nextNodeId, label, times);
     this.nodes[this.nextNodeId] = node;
-    this.addKeyTimes(startTime, endTime);
+    this.addKeyTimes(...getKeyTimes(times));
     this.nextNodeId += 1;
     return node;
   }
