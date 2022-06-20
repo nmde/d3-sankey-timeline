@@ -16,6 +16,8 @@ export default class Renderer {
     nodes: [],
   };
 
+  private minY = 0;
+
   public options = {
     curveHeight: 50,
     curveWidth: 200,
@@ -98,6 +100,7 @@ export default class Renderer {
    */
   public calculateLayout(): TimelineGraph {
     this.graph = this.timeline.graph;
+    this.minY = 0;
     // First pass - initial placements based only on instrinsic properties
     this.graph.nodes.forEach((node, n) => {
       const x =
@@ -129,6 +132,14 @@ export default class Renderer {
     this.calculateLinkPaths();
     // Third pass - Adjust nodes to prevent nodes from overlapping with links
     this.preventLinkOverlaps();
+    // Prevent overlaps with the new positions
+    this.preventNodeOverlaps();
+    // Scale everything to fit the window
+    this.graph.nodes.forEach((node) => {
+      node.layout.y += -1 * this.minY;
+    });
+    // Calculate final link positions
+    this.calculateLinkPaths();
     return this.graph;
   }
 
@@ -147,52 +158,76 @@ export default class Renderer {
       const linkOverlaps: number[] = [];
       const intersections: number[][][][] = [];
       const linkOverlapDirections: number[] = [];
-      Object.values(this.graph.links).forEach((link) => {
-        [
-          [topLeft, topLeft, topRight, topRight],
-          [topRight, topRight, bottomRight, bottomRight],
-          [bottomRight, bottomRight, bottomLeft, bottomLeft],
-          [bottomLeft, bottomLeft, topLeft, topLeft],
-        ].forEach((curve) => {
+      Object.values(this.graph.links)
+        // TODO: handle self linking?
+        .filter((link) => !link.isSelfLinking)
+        .forEach((link) => {
           [
-            link.layout.curve.map((x) =>
-              x.map((y) => y - link.layout.width / 2)),
-            link.layout.curve.map((x) =>
-              x.map((y) => y + link.layout.width / 2)),
-          ].forEach((c) => {
-            const i = bezierBezierIntersectionFast(curve, c);
-            if (i.length > 0 && linkOverlaps.indexOf(link.id) < 0) {
-              linkOverlaps.push(link.id);
-              linkOverlapDirections.push(
-                link.source.layout.y - link.target.layout.y,
-              );
-              intersections.push(
-                i.map((j) => j.map((k) => evalDeCasteljau(c, k))),
-              );
-            }
+            [topLeft, topLeft, topRight, topRight],
+            [topRight, topRight, bottomRight, bottomRight],
+            [bottomRight, bottomRight, bottomLeft, bottomLeft],
+            [bottomLeft, bottomLeft, topLeft, topLeft],
+          ].forEach((curve) => {
+            [
+              link.layout.curve.map((x) =>
+                x.map((y) => y - link.layout.width / 2),
+              ),
+              link.layout.curve.map((x) =>
+                x.map((y) => y + link.layout.width / 2),
+              ),
+            ].forEach((c) => {
+              const i = bezierBezierIntersectionFast(curve, c);
+              if (i.length > 0 && linkOverlaps.indexOf(link.id) < 0) {
+                linkOverlaps.push(link.id);
+                let direction = 1;
+                if (
+                  link.source.layout.x + link.source.layout.width >=
+                  link.target.layout.x
+                ) {
+                  direction = -1;
+                }
+                linkOverlapDirections.push(direction);
+                intersections.push(
+                  i.map((j) => j.map((k) => evalDeCasteljau(c, k))),
+                );
+              }
+            });
           });
         });
-      });
-      let maxY = node.layout.y;
-      const incomingLinks = node.incomingLinks.map((link) => link.id);
+      let shiftUp = 0;
+      let shiftDown = 0;
+      console.log(node.label);
+      console.log(`${shiftDown}, ${shiftUp}`);
       intersections.forEach((overlaps, i) => {
+        console.log(
+          `${JSON.stringify(overlaps)} - ${linkOverlapDirections[i]}`,
+        );
         overlaps.forEach((curve) => {
           curve
             .map((p) => p.map((q) => Number(q.toFixed(2))))
             .forEach((point) => {
-              if (
-                point[1] > maxY &&
-                linkOverlapDirections[i] < 0 &&
-                incomingLinks.indexOf(linkOverlaps[i]) >= 0
-              ) {
-                [, maxY] = point;
+              if (linkOverlapDirections[i] < 0) {
+                if (
+                  point[1] < node.layout.y + node.layout.height / 2 &&
+                  point[1] > shiftUp
+                ) {
+                  [, shiftUp] = point;
+                } else if (
+                  point[1] > node.layout.y + node.layout.height / 2 &&
+                  point[1] > shiftDown
+                ) {
+                  [, shiftDown] = point;
+                } else {
+                  console.log(point);
+                }
+              } else if (point[1] > shiftUp) {
+                console.log(point);
               }
             });
         });
       });
-      this.graph.nodes[n].layout.y = maxY;
-      this.preventNodeOverlaps();
-      this.calculateLinkPaths();
+      console.log(`${shiftDown}, ${shiftUp}`);
+      this.graph.nodes[n].layout.y += shiftUp - shiftDown;
     });
   }
 
@@ -222,6 +257,9 @@ export default class Renderer {
           }
         });
       this.graph.nodes[n].layout.y = minY;
+      if (minY < this.minY) {
+        this.minY = minY;
+      }
     });
   }
 
@@ -280,7 +318,8 @@ export default class Renderer {
       .attr('stroke', (d) =>
         (
           color(gradient(d.source.id / graph.nodes.length)) as RGBColor
-        ).toString())
+        ).toString(),
+      )
       .style('mix-blend-mode', 'multiply');
 
     link

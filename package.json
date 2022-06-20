@@ -5,8 +5,8 @@
   "main": "dist/d3-sankey-timeline.js",
   "packageManager": "yarn@3.2.1",
   "scripts": {
-    "test": "yarn jest",
-    "build": "yarn webpack"
+    "test": "node .yarn/releases/yarn-3.2.1.cjs jest",
+    "build": "node .yarn/releases/yarn-3.2.1.cjs webpack"
   },
   "repository": {
     "type": "git",
