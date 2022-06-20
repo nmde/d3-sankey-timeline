@@ -23,19 +23,20 @@ export default class Renderer {
   public options = {
     curveHeight: 50,
     curveWidth: 200,
-    distHandleWidth: 5,
+    distHandleWidth: 3,
     distributions: true,
     dynamicLinkWidth: true,
     dynamicNodeHeight: false,
     endColor: 'orange',
     fontColor: 'white',
     fontSize: 25,
-    maxLinkWidth: 100,
+    height: window.innerHeight,
+    margin: 100,
+    maxLinkWidth: 50,
     maxNodeHeight: 100,
     startColor: 'purple',
+    width: window.innerWidth,
   };
-
-  public range: [number, number];
 
   public timeline: SankeyTimeline;
 
@@ -43,11 +44,9 @@ export default class Renderer {
    * Constructs Renderer.
    *
    * @param timeline - The timeline to render.
-   * @param range - The range of device pixels to render over (within the SVG).
    */
-  public constructor(timeline: SankeyTimeline, range: [number, number]) {
+  public constructor(timeline: SankeyTimeline) {
     this.timeline = timeline;
-    this.range = range;
   }
 
   /**
@@ -136,9 +135,21 @@ export default class Renderer {
     this.preventLinkOverlaps();
     // Prevent overlaps with the new positions
     this.preventNodeOverlaps();
-    // Fourth pass - Scale everything to fit the window, add in distribution elements
+    // Fourth pass - Keep nodes from going off the screen and add additional graph elements
+    let maxY = 0;
     this.graph.nodes.forEach((node) => {
-      node.layout.y += -1 * this.minY;
+      node.layout.y -= this.minY;
+      if (node.layout.y + node.layout.height > maxY) {
+        maxY = node.layout.y + node.layout.height;
+      }
+    });
+    this.graph.nodes.forEach((node) => {
+      console.log(`${node.layout.y} / ${maxY}`);
+      node.layout.y =
+        this.options.height * (node.layout.y / maxY);
+      if (node.layout.y + node.layout.height > this.options.height) {
+        node.layout.y = this.options.height - node.layout.height;
+      }
       if (hasDist(node.times) && this.options.distributions) {
         node.layout.distribution = [
           {
@@ -263,6 +274,15 @@ export default class Renderer {
   }
 
   /**
+   * The chart range.
+   *
+   * @returns The chart range.
+   */
+  private get range(): [number, number] {
+    return [this.options.margin, this.options.width - this.options.margin];
+  }
+
+  /**
    * Renders the graph.
    */
   public render(): void {
@@ -271,8 +291,8 @@ export default class Renderer {
     // Create the graph element
     const svg = select('svg')
       .style('background', '#fff')
-      .style('width', '100%')
-      .style('height', '100%');
+      .style('width', this.options.width)
+      .style('height', this.options.height);
 
     // Use d3-axis to create an axis
     svg

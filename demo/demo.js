@@ -2,11 +2,8 @@
 
 const timeline = new sankeyTimeline.SankeyTimeline();
 const { data } = window;
-const range = [200, window.innerWidth - 200];
-const renderer = new sankeyTimeline.Renderer(timeline, range);
-renderer.options.dynamicLinkWidth = true;
-renderer.options.distributions = true;
-renderer.options.maxLinkWidth = 50;
+const renderer = new sankeyTimeline.Renderer(timeline);
+renderer.options.height = 700;
 
 const nodes = {};
 const links = {};
@@ -81,4 +78,4 @@ Object.keys(nodes).forEach((n) => {
   });
 });
 
-renderer.render(timeline, range);
+renderer.render(timeline);
