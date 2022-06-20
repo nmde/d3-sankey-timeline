@@ -17,7 +17,6 @@ Object.keys(renderer.options).forEach((optionName) => {
   input.addEventListener('change', () => {
     const num = Number(input.value);
     if (Number.isNaN(num)) {
-      console.log(input.value);
       renderer.options[optionName] = input.value;
     } else {
       renderer.options[optionName] = num;

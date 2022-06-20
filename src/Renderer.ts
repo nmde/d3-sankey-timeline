@@ -179,10 +179,8 @@ export default class Renderer {
       .forEach((link) => {
         [
           [topLeft, topLeft, topRight, topRight],
-          [topRight, topRight, bottomRight, bottomRight],
           [bottomRight, bottomRight, bottomLeft, bottomLeft],
-          [bottomLeft, bottomLeft, topLeft, topLeft],
-        ].forEach((curve) => {
+        ].forEach((boxCurve) => {
           [
             link.layout.curve.map((x) =>
               x.map((y) => y - link.layout.width / 2),
@@ -190,12 +188,12 @@ export default class Renderer {
             link.layout.curve.map((x) =>
               x.map((y) => y + link.layout.width / 2),
             ),
-          ].forEach((c) => {
-            const i = bezierBezierIntersectionFast(curve, c);
+          ].forEach((linkCurve) => {
+            const i = bezierBezierIntersectionFast(boxCurve, linkCurve);
             if (i.length > 0 && linkOverlaps.indexOf(link.id) < 0) {
               linkOverlaps.push(link.id);
               intersections.push(
-                i.map((j) => j.map((k) => evalDeCasteljau(c, k))),
+                i.map((j) => j.map((k) => evalDeCasteljau(boxCurve, k))),
               );
             }
           });
@@ -292,21 +290,10 @@ export default class Renderer {
         ),
       );
 
-    // Create nodes
     const gradient = interpolateHsl(
       color(this.options.startColor) as HSLColor,
       color(this.options.endColor) as HSLColor,
     );
-    svg
-      .append('g')
-      .selectAll('rect')
-      .data(graph.nodes)
-      .join('rect')
-      .attr('x', (d) => d.layout.x)
-      .attr('y', (d) => d.layout.y)
-      .attr('height', (d) => d.layout.height)
-      .attr('width', (d) => d.layout.width)
-      .attr('fill', (d) => gradient(d.id / graph.nodes.length));
 
     // Create links
     const link = svg
@@ -330,6 +317,18 @@ export default class Renderer {
     link
       .append('title')
       .text((d) => `${d.source.label} → ${d.target.label}\n${d.flow}`);
+
+    // Create nodes
+    svg
+      .append('g')
+      .selectAll('rect')
+      .data(graph.nodes)
+      .join('rect')
+      .attr('x', (d) => d.layout.x)
+      .attr('y', (d) => d.layout.y)
+      .attr('height', (d) => d.layout.height)
+      .attr('width', (d) => d.layout.width)
+      .attr('fill', (d) => gradient(d.id / graph.nodes.length));
 
     // Distribution handles
     const handleLayer = svg
