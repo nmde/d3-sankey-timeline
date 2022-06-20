@@ -1,4 +1,3 @@
-import { sum } from 'd3';
 import type SankeyTimeline from './SankeyTimeline';
 import type TimelineLink from './TimelineLink';
 import { NodeLayout } from './types';
@@ -93,4 +92,12 @@ export default class TimelineNode {
       sum(this.outgoingLinks, (link) => link.flow),
     );
   }
+}
+
+function sum<T>(arr: T[], fn: (link: T) => number): number {
+  let sum = 0;
+  arr.forEach((value) => {
+    sum += fn(value);
+  });
+  return sum;
 }
