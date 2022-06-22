@@ -101,6 +101,7 @@
   "include": [
     "*.js",
     "src",
-    "demo"
+    "demo",
+    "tests"
   ]
 }

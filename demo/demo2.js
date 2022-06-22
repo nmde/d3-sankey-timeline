@@ -5,6 +5,7 @@ const margin = 100;
 const range = [margin, window.innerWidth - margin];
 const renderer = new sankeyTimeline.Renderer(timeline, range);
 renderer.options.height = 700;
+renderer.options.dynamicNodeHeight = true;
 
 let v0;
 let v1;
@@ -35,7 +36,7 @@ const steps = [
     timeline.createLink(v1, v3, 30);
   },
   () => {
-    v4 = timeline.createNode('v4', { endTime: 12, startTime: 6 });
+    v4 = timeline.createNode('v4', { endTime: 12, meanTime: 8, startTime: 6, stdDeviation: 2 });
   },
   () => {
     timeline.createLink(v2, v4, 4);

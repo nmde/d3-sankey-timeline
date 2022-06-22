@@ -3384,7 +3384,7 @@ __metadata:
     flo-bezier3: ^4.0.1
     jest: ^28.1.1
     jest-extended: ^2.0.0
-    nmde-common: "https://github.com/nmde/nmde-common.git#a849fb5eb5054983c3393cb046b7c45651bd44c4"
+    nmde-common: "https://github.com/nmde/nmde-common.git#0065f98ba13a23b81035f216e0b8396016610cf1"
     ts-jest: ^28.0.5
     ts-loader: ^9.3.0
     typescript: ^4.7.4
@@ -6004,9 +6004,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nmde-common@https://github.com/nmde/nmde-common.git#a849fb5eb5054983c3393cb046b7c45651bd44c4":
+"nmde-common@https://github.com/nmde/nmde-common.git#0065f98ba13a23b81035f216e0b8396016610cf1":
   version: 0.1.0
-  resolution: "nmde-common@https://github.com/nmde/nmde-common.git#commit=a849fb5eb5054983c3393cb046b7c45651bd44c4"
+  resolution: "nmde-common@https://github.com/nmde/nmde-common.git#commit=0065f98ba13a23b81035f216e0b8396016610cf1"
   dependencies:
     "@babel/core": ^7.18.5
     "@babel/plugin-proposal-class-properties": ^7.17.12
@@ -6037,7 +6037,7 @@ __metadata:
     webpack: ^5.73.0
     webpack-merge: ^5.8.0
     webpack-node-externals: ^3.0.0
-  checksum: e91a9ea98f7d3fec5e78602c6468874a26c4b28f840521cb3e4e63aece6b44c1f3402a8fd6a7ef25f73847c64f8265b647abcc392b30c707243665aa0c971fb9
+  checksum: d9f2a83218cf42b0d6706a902e12c821792b3b594d09ca4f8ae412a6121a520a44073235aeb28f22ee068d773d80e7e7f2c3311ce826617a9179dfaccd28646b
   languageName: node
   linkType: hard
 
