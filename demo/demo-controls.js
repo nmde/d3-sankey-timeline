@@ -22,7 +22,7 @@ Object.keys(renderer.options).forEach((optionName) => {
       renderer.options[optionName] = num;
     }
     d3.selectAll('svg > *').remove();
-    renderer.render();
+    renderer.render(d3.select('svg'));
   });
   container.appendChild(input);
   form?.appendChild(container);

@@ -3,8 +3,9 @@
 const timeline = new sankeyTimeline.SankeyTimeline();
 const { data } = window;
 const renderer = new sankeyTimeline.Renderer(timeline);
-renderer.options.height = 700;
+renderer.options.height = 1085;
 renderer.options.dynamicNodeHeight = true;
+renderer.options.layout = 'fixed';
 
 const nodes = {};
 const links = {};
@@ -79,4 +80,4 @@ Object.keys(nodes).forEach((n) => {
   });
 });
 
-renderer.render(timeline);
+renderer.render(d3.select('svg'));

@@ -31,6 +31,7 @@ export default class Renderer {
     fontColor: 'white',
     fontSize: 25,
     height: window.innerHeight,
+    layout: 'default',
     margin: 100,
     maxLinkWidth: 50,
     maxNodeHeight: 100,
@@ -96,6 +97,26 @@ export default class Renderer {
   }
 
   /**
+   * Calculates the distribution data layout for nodes in the graph.
+   */
+  private calculateDistributionLayout() {
+    this.graph.nodes.forEach((node) => {
+      if (hasDist(node.times) && this.options.distributions) {
+        node.layout.distribution = [
+          {
+            x: this.getTimeX(node.times.startTime),
+            y: node.layout.y,
+          },
+          {
+            x: this.getTimeX(node.times.endTime),
+            y: node.layout.y,
+          },
+        ];
+      }
+    });
+  }
+
+  /**
    * Given the bounds of the container to render in,
    * construct a clone of the graph with all measurements adjusted to fit in the given range.
    *
@@ -103,30 +124,35 @@ export default class Renderer {
    */
   public calculateLayout(): TimelineGraph {
     this.graph = this.timeline.graph;
+    if (this.options.layout === 'fixed') {
+      this.initializeLayout();
+      const rows: TimelineNode[][] = [];
+      const placed: number[] = [];
+      this.graph.nodes.forEach((node) => {
+        if (placed.indexOf(node.id) < 0) {
+          rows.push([]);
+          this.findNodeOverlaps(node)
+            .map((overlap) => overlap.node)
+            .forEach((o) => {
+              rows[rows.length - 1].push(o);
+              placed.push(o.id);
+            });
+        }
+      });
+      rows.forEach((row) => {
+        const columnHeight = this.options.height / row.length;
+        for (let col = 0; col < row.length; col += 1) {
+          this.graph.nodes[row[col].id].layout.y = col * columnHeight;
+        }
+      });
+      this.calculateLinkPaths();
+      this.calculateDistributionLayout();
+      return this.graph;
+    }
     this.minY = 0;
     // First pass - initial placements based only on instrinsic properties
     // TODO - save x1 in layout
-    this.graph.nodes.forEach((node, n) => {
-      let keyTimes = [node.times.startTime, node.times.endTime];
-      if (this.options.distributions) {
-        keyTimes = getKeyTimes(node.times);
-      }
-      const x = this.getTimeX(keyTimes[0]);
-      let width = this.getTimeX(keyTimes[1]) - x;
-      if (Number.isNaN(width)) {
-        width = 0;
-      }
-      let height = this.options.maxNodeHeight;
-      if (this.options.dynamicNodeHeight) {
-        height *= node.size / this.timeline.maxSize;
-      }
-      this.graph.nodes[n].layout = {
-        height,
-        width,
-        x,
-        y: 0,
-      };
-    });
+    this.initializeLayout();
     // Second pass - Adjust X and Y coordinates to try and minimize overlapping nodes
     this.preventNodeOverlaps();
     // Calculate initial link positions
@@ -144,25 +170,12 @@ export default class Renderer {
       }
     });
     this.graph.nodes.forEach((node) => {
-      console.log(`${node.layout.y} / ${maxY}`);
-      node.layout.y =
-        this.options.height * (node.layout.y / maxY);
+      node.layout.y = this.options.height * (node.layout.y / maxY);
       if (node.layout.y + node.layout.height > this.options.height) {
         node.layout.y = this.options.height - node.layout.height;
       }
-      if (hasDist(node.times) && this.options.distributions) {
-        node.layout.distribution = [
-          {
-            x: this.getTimeX(node.times.startTime),
-            y: node.layout.y,
-          },
-          {
-            x: this.getTimeX(node.times.endTime),
-            y: node.layout.y,
-          },
-        ];
-      }
     });
+    this.calculateDistributionLayout();
     // Calculate final link positions
     this.calculateLinkPaths();
     return this.graph;
@@ -216,6 +229,64 @@ export default class Renderer {
   }
 
   /**
+   * Finds nodes that overlap with the given node.
+   *
+   * @param node - The node to find overlaps for.
+   * @param strict - If true, borders touching will be considered an overlap.
+   * @returns Other nodes that overlap with the given node.
+   */
+  private findNodeOverlaps(node: TimelineNode, strict = true) {
+    const overlaps: { node: TimelineNode; range: [number, number] }[] = [];
+    this.graph.nodes.forEach((o) => {
+      if (
+        (strict &&
+          ((o.layout.x + o.layout.width >= node.layout.x &&
+            o.layout.x <= node.layout.x) ||
+            (node.layout.x + node.layout.width >= o.layout.x &&
+              node.layout.x <= o.layout.x))) ||
+        (!strict &&
+          ((o.layout.x + o.layout.width > node.layout.x &&
+            o.layout.x <= node.layout.x) ||
+            (node.layout.x + node.layout.width > o.layout.x &&
+              node.layout.x <= o.layout.x)))
+      ) {
+        overlaps.push({
+          node: o,
+          range: [o.layout.y, o.layout.y + o.layout.height],
+        });
+      }
+    });
+    return overlaps;
+  }
+
+  /**
+   * Places nodes in their initial positions.
+   */
+  private initializeLayout() {
+    this.graph.nodes.forEach((node, n) => {
+      let keyTimes = [node.times.startTime, node.times.endTime];
+      if (this.options.distributions) {
+        keyTimes = getKeyTimes(node.times);
+      }
+      const x = this.getTimeX(keyTimes[0]);
+      let width = this.getTimeX(keyTimes[1]) - x;
+      if (Number.isNaN(width)) {
+        width = 0;
+      }
+      let height = this.options.maxNodeHeight;
+      if (this.options.dynamicNodeHeight) {
+        height *= node.size / this.timeline.maxSize;
+      }
+      this.graph.nodes[n].layout = {
+        height,
+        width,
+        x,
+        y: 0,
+      };
+    });
+  }
+
+  /**
    * Adjusts nodes to prevent overlaps between nodes and links.
    */
   private preventLinkOverlaps() {
@@ -246,20 +317,10 @@ export default class Renderer {
    */
   private preventNodeOverlaps() {
     this.graph.nodes.forEach((node, n) => {
-      const overlapRanges: number[][] = [];
-      this.graph.nodes.forEach((o, m) => {
-        if (
-          m < n &&
-          ((o.layout.x + o.layout.width >= node.layout.x &&
-            o.layout.x <= node.layout.x) ||
-            (node.layout.x + node.layout.width >= o.layout.x &&
-              node.layout.x <= o.layout.x))
-        ) {
-          overlapRanges.push([o.layout.y, o.layout.y + o.layout.height]);
-        }
-      });
+      // TODO: m < n
       let minY = node.layout.y;
-      overlapRanges
+      this.findNodeOverlaps(node)
+        .map((overlap) => overlap.range)
         .sort((a, b) => a[0] - b[0])
         .forEach((overlap) => {
           if (minY >= overlap[0] && minY <= overlap[1]) {
@@ -284,12 +345,14 @@ export default class Renderer {
 
   /**
    * Renders the graph.
+   *
+   * @param svg - The SVG element to render within.
    */
-  public render(): void {
+  public render(svg: ReturnType<typeof select>): void {
     const graph = this.calculateLayout();
 
     // Create the graph element
-    const svg = select('svg')
+    svg
       .style('background', '#fff')
       .style('width', this.options.width)
       .style('height', this.options.height);

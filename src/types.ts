@@ -28,3 +28,5 @@ export interface NodeTimes {
   startTime: number;
   stdDeviation?: number;
 }
+
+export type Layout = 'default' | 'fixed';
