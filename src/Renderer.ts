@@ -1,13 +1,19 @@
 import { axisBottom } from 'd3-axis';
 import { color, HSLColor, RGBColor } from 'd3-color';
+import { easeCubicIn } from 'd3-ease';
 import { interpolateHsl } from 'd3-interpolate';
 import { scaleLinear } from 'd3-scale';
-import { select } from 'd3-selection';
+import { select, selectAll } from 'd3-selection';
+import { transition } from 'd3-transition';
 import { bezierBezierIntersectionFast, evalDeCasteljau } from 'flo-bezier3';
 import SankeyTimeline from './SankeyTimeline';
+import type TimelineLink from './TimelineLink';
 import TimelineNode from './TimelineNode';
 import type { TimelineGraph } from './types';
 import { getKeyTimes, hasDist } from './util';
+
+// The typings for d3-transition are incompatible with d3-selection, so we have to use ts-ignore when using transitions.
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 
 /**
  * Renders the chart using D3.
@@ -28,6 +34,7 @@ export default class Renderer {
     dynamicLinkWidth: true,
     dynamicNodeHeight: false,
     endColor: 'orange',
+    fadeOpacity: 0.3,
     fontColor: 'white',
     fontSize: 25,
     height: window.innerHeight,
@@ -36,6 +43,7 @@ export default class Renderer {
     maxLinkWidth: 50,
     maxNodeHeight: 100,
     startColor: 'purple',
+    transitionSpeed: 75,
     width: window.innerWidth,
   };
 
@@ -375,7 +383,7 @@ export default class Renderer {
     );
 
     // Create links
-    const link = svg
+    const links = svg
       .append('g')
       .attr('fill', 'none')
       .selectAll('g')
@@ -386,39 +394,86 @@ export default class Renderer {
           color(gradient(d.source.id / graph.nodes.length)) as RGBColor
         ).toString(),
       )
+      .attr('class', 'link')
       .style('mix-blend-mode', 'multiply');
 
-    link
+    links
       .append('path')
       .attr('d', (d) => d.layout.path)
       .attr('stroke-width', (d) => Math.max(1, d.layout.width));
 
-    link
+    links
       .append('title')
       .text((d) => `${d.source.label} → ${d.target.label}\n${d.flow}`);
 
     // Create nodes
-    svg
+    const nodes = svg
       .append('g')
-      .selectAll('rect')
+      .selectAll('g')
       .data(graph.nodes)
-      .join('rect')
+      .join('g')
       .attr('x', (d) => d.layout.x)
       .attr('y', (d) => d.layout.y)
       .attr('height', (d) => d.layout.height)
       .attr('width', (d) => d.layout.width)
-      .attr('fill', (d) => gradient(d.id / graph.nodes.length));
+      .attr('class', 'node')
+      // TODO: Make this renderer-agnostic
+      .on('mouseover', (event, d) => {
+        let shortestPath: number[] = [];
+        this.timeline.getPath(d.id).forEach((path) => {
+          if (shortestPath.length === 0 || path.length < shortestPath.length) {
+            shortestPath = path;
+          }
+        });
+        const { options } = this;
+        selectAll('.node').each(function (n) {
+          const node = n as TimelineNode;
+          if (shortestPath.indexOf(node.id) < 0) {
+            select(this)
+              .transition(
+                // @ts-ignore
+                transition()
+                  .duration(options.transitionSpeed)
+                  .ease(easeCubicIn),
+              )
+              .style('opacity', options.fadeOpacity);
+          }
+        });
+        const pathLinks = this.timeline.getLinksInPath(shortestPath);
+        selectAll('.link').each(function (l) {
+          const link = l as TimelineLink;
+          if (pathLinks.indexOf(link.id) < 0) {
+            select(this)
+              .transition(
+                // @ts-ignore
+                transition()
+                  .duration(options.transitionSpeed)
+                  .ease(easeCubicIn),
+              )
+              .style('opacity', options.fadeOpacity);
+          }
+        });
+      })
+      .on('mouseleave', () => {
+        selectAll('.node, .link')
+          .transition(
+            // @ts-ignore
+            transition()
+              .duration(this.options.transitionSpeed)
+              .ease(easeCubicIn),
+          )
+          .style('opacity', 1);
+      });
+    nodes
+      .append('rect')
+      .attr('fill', (d) => gradient(d.id / graph.nodes.length))
+      .attr('x', (d) => d.layout.x)
+      .attr('y', (d) => d.layout.y)
+      .attr('height', (d) => d.layout.height)
+      .attr('width', (d) => d.layout.width);
 
-    // Distribution handles
-    const handleLayer = svg
-      .append('g')
-      .selectAll('rect')
-      .data(
-        graph.nodes.filter((node) => node.layout.distribution !== undefined),
-      )
-      .enter();
     // Left handle
-    handleLayer
+    nodes
       .append('rect')
       .attr('x', (d) => {
         if (d.layout.distribution) {
@@ -436,7 +491,7 @@ export default class Renderer {
       .attr('width', () => this.options.distHandleWidth)
       .attr('fill', (d) => gradient(d.id / graph.nodes.length));
     // Right handle
-    handleLayer
+    nodes
       .append('rect')
       .attr('x', (d) => {
         if (d.layout.distribution) {
@@ -454,7 +509,7 @@ export default class Renderer {
       .attr('width', () => this.options.distHandleWidth)
       .attr('fill', (d) => gradient(d.id / graph.nodes.length));
     // Center line
-    handleLayer
+    nodes
       .append('rect')
       .attr('x', (d) => {
         if (d.layout.distribution) {
@@ -478,11 +533,8 @@ export default class Renderer {
       .attr('fill', (d) => gradient(d.id / graph.nodes.length));
 
     // Create labels
-    svg
-      .append('g')
-      .selectAll('text')
-      .data(graph.nodes)
-      .join('text')
+    nodes
+      .append('text')
       .attr('x', (d) => d.layout.x + d.layout.width / 2)
       .attr('y', (d) => d.layout.y + d.layout.height / 2)
       .attr('text-anchor', 'middle')

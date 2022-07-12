@@ -1,10 +1,7 @@
 import findCircuits from 'elementary-circuits-directed-graph';
 import TimelineLink from './TimelineLink';
 import TimelineNode from './TimelineNode';
-import {
-  NodeTimes,
-  TimelineGraph,
-} from './types';
+import { NodeTimes, TimelineGraph } from './types';
 import { getKeyTimes } from './util';
 
 /**
@@ -111,6 +108,25 @@ export default class SankeyTimeline {
   }
 
   /**
+   * Gets the IDs of links in the given path.
+   *
+   * @param path - The path to find links in.
+   * @returns Links between the nodes in the path.
+   */
+  public getLinksInPath(path: number[]): number[] {
+    const links: number[] = [];
+    for (let i = path.length - 1; i > 0; i -= 1) {
+      const l = this.nodes[path[i]].outgoingLinks.find(
+        (link) => link.target.id === path[i - 1],
+      )?.id;
+      if (l !== undefined) {
+        links.push(l);
+      }
+    }
+    return links;
+  }
+
+  /**
    * Returns all nodes with the given label.
    *
    * @param label - The label of nodes to find.
@@ -118,6 +134,29 @@ export default class SankeyTimeline {
    */
   public getNodesByLabel(label: string): TimelineNode[] {
     return Object.values(this.nodes).filter((node) => node.label === label);
+  }
+
+  /**
+   * Gets the possible paths of nodes leading to the node with the given ID.
+   *
+   * @param id - The node to get the path for.
+   * @returns The possible paths to the node.
+   */
+  public getPath(id: number): number[][] {
+    const target = this.nodes[id];
+    const possiblePaths: number[][] = [];
+    if (target.incomingLinks.length === 0) {
+      possiblePaths.push([id]);
+    } else {
+      target.incomingLinks
+        .filter((link) => !link.isCircular)
+        .forEach((link) => {
+          this.getPath(link.source.id).forEach((path) => {
+            possiblePaths.push([id].concat(path));
+          });
+        });
+    }
+    return possiblePaths;
   }
 
   /**
@@ -184,5 +223,27 @@ export default class SankeyTimeline {
       return this.keyTimes[0];
     }
     return 0;
+  }
+
+  /**
+   * Gets nodes with no outputs.
+   *
+   * @returns Nodes with no outputs.
+   */
+  public get sinkNodes(): TimelineNode[] {
+    return Object.values(this.nodes).filter(
+      (node) => node.outgoingLinks.length === 0,
+    );
+  }
+
+  /**
+   * Gets nodes with no inputs.
+   *
+   * @returns Nodes with no inputs.
+   */
+  public get sourceNodes(): TimelineNode[] {
+    return Object.values(this.nodes).filter(
+      (node) => node.incomingLinks.length === 0,
+    );
   }
 }

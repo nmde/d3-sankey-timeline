@@ -1912,6 +1912,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/d3-ease@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@types/d3-ease@npm:3.0.0"
+  checksum: 1be7c993643b5a08332e0ee146375a3845545d8deb423db5d152e0b061524385d2345ceccf968f75f605247b940dd3f9a144335fee2e7d935cddaf187afb7095
+  languageName: node
+  linkType: hard
+
 "@types/d3-interpolate@npm:^3.0.1":
   version: 3.0.1
   resolution: "@types/d3-interpolate@npm:3.0.1"
@@ -1941,6 +1948,15 @@ __metadata:
   version: 3.0.0
   resolution: "@types/d3-time@npm:3.0.0"
   checksum: e76adb056daccf80107f4db190ac6deb77e8774f00362bb6c76f178e67f2f217422fe502b654edbc9ac6451f6619045b9f6f5fe0db1ec5520e2ada377af7c72e
+  languageName: node
+  linkType: hard
+
+"@types/d3-transition@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "@types/d3-transition@npm:3.0.1"
+  dependencies:
+    "@types/d3-selection": "*"
+  checksum: 7e9bd99bf54e52c839d229367ec5ffdd84e6fd83544381ad7c69db4b47f23a658f733ea7a6d551bc340d37affce76513dab5f8df80053bd8c1a8101ff58115c7
   languageName: node
   linkType: hard
 
@@ -3336,6 +3352,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"d3-dispatch@npm:1 - 3":
+  version: 3.0.1
+  resolution: "d3-dispatch@npm:3.0.1"
+  checksum: fdfd4a230f46463e28e5b22a45dd76d03be9345b605e1b5dc7d18bd7ebf504e6c00ae123fd6d03e23d9e2711e01f0e14ea89cd0632545b9f0c00b924ba4be223
+  languageName: node
+  linkType: hard
+
+"d3-ease@npm:1 - 3, d3-ease@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "d3-ease@npm:3.0.1"
+  checksum: 06e2ee5326d1e3545eab4e2c0f84046a123dcd3b612e68858219aa034da1160333d9ce3da20a1d3486d98cb5c2a06f7d233eee1bc19ce42d1533458bd85dedcd
+  languageName: node
+  linkType: hard
+
 "d3-format@npm:1 - 3":
   version: 3.1.0
   resolution: "d3-format@npm:3.1.0"
@@ -3343,7 +3373,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"d3-interpolate@npm:1.2.0 - 3, d3-interpolate@npm:^3.0.1":
+"d3-interpolate@npm:1 - 3, d3-interpolate@npm:1.2.0 - 3, d3-interpolate@npm:^3.0.1":
   version: 3.0.1
   resolution: "d3-interpolate@npm:3.0.1"
   dependencies:
@@ -3361,9 +3391,11 @@ __metadata:
     "@babel/preset-env": ^7.18.2
     "@types/d3-axis": ^3.0.1
     "@types/d3-color": ^3.1.0
+    "@types/d3-ease": ^3.0.0
     "@types/d3-interpolate": ^3.0.1
     "@types/d3-scale": ^4.0.2
     "@types/d3-selection": ^3.0.2
+    "@types/d3-transition": ^3.0.1
     "@types/elementary-circuits-directed-graph": ^1.2.0
     "@types/jest": ^28.1.2
     "@typescript-eslint/eslint-plugin": ^5.28.0
@@ -3371,9 +3403,11 @@ __metadata:
     babel-loader: ^8.2.5
     d3-axis: ^3.0.0
     d3-color: ^3.1.0
+    d3-ease: ^3.0.1
     d3-interpolate: ^3.0.1
     d3-scale: ^4.0.2
     d3-selection: ^3.0.0
+    d3-transition: ^3.0.1
     elementary-circuits-directed-graph: ^1.3.1
     eslint: ^7.24.0
     eslint-config-airbnb-typescript: ^17.0.0
@@ -3428,6 +3462,28 @@ __metadata:
   dependencies:
     d3-array: 2 - 3
   checksum: 01646568ef01682550b7ee9f32394e4eb116a29515564861958871ed8de8fff02a25cd50dd8c4413921e6d9ecb8c8ce39be3266f655c8c18599fe58bcb253d60
+  languageName: node
+  linkType: hard
+
+"d3-timer@npm:1 - 3":
+  version: 3.0.1
+  resolution: "d3-timer@npm:3.0.1"
+  checksum: 1cfddf86d7bca22f73f2c427f52dfa35c49f50d64e187eb788dcad6e927625c636aa18ae4edd44d084eb9d1f81d8ca4ec305dae7f733c15846a824575b789d73
+  languageName: node
+  linkType: hard
+
+"d3-transition@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "d3-transition@npm:3.0.1"
+  dependencies:
+    d3-color: 1 - 3
+    d3-dispatch: 1 - 3
+    d3-ease: 1 - 3
+    d3-interpolate: 1 - 3
+    d3-timer: 1 - 3
+  peerDependencies:
+    d3-selection: 2 - 3
+  checksum: cb1e6e018c3abf0502fe9ff7b631ad058efb197b5e14b973a410d3935aead6e3c07c67d726cfab258e4936ef2667c2c3d1cd2037feb0765f0b4e1d3b8788c0ea
   languageName: node
   linkType: hard
 

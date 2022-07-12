@@ -3,9 +3,12 @@
 const timeline = new sankeyTimeline.SankeyTimeline();
 const margin = 100;
 const range = [margin, window.innerWidth - margin];
-const renderer = new sankeyTimeline.Renderer(timeline, range);
+const renderer = new sankeyTimeline.Renderer(timeline);
+renderer.options.margin = margin;
+renderer.options.width = window.innerWidth;
 renderer.options.height = 700;
 renderer.options.dynamicNodeHeight = true;
+renderer.options.layout = 'fixed';
 
 let v0;
 let v1;
@@ -61,6 +64,7 @@ const steps = [
   },
 ];
 
+const svg = d3.select('svg');
 const animated = false;
 const stepTime = 1000;
 const maxStep = steps.length - 1;
@@ -72,7 +76,7 @@ if (animated) {
     console.log(`Step ${currentStep}`);
     steps[currentStep]();
     d3.selectAll('svg > *').remove();
-    renderer.render();
+    renderer.render(svg);
     if (currentStep === maxStep) {
       clearInterval(interval);
     }
@@ -82,5 +86,5 @@ if (animated) {
   for (let currentStep = 0; currentStep < maxStep; currentStep += 1) {
     steps[currentStep]();
   }
-  renderer.render();
+  renderer.render(svg);
 }

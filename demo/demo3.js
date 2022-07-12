@@ -7,7 +7,7 @@ renderer.options.width = 1360;
 renderer.options.margin = 100;
 renderer.options.maxNodeHeight = 38;
 renderer.options.maxLinkWidth = 5;
-renderer.options.layout = 'fixed+';
+renderer.options.layout = 'fixed';
 renderer.options.fontSize = 18;
 
 timeline.createNode('Program', {
@@ -307,4 +307,5 @@ timeline.createLink('Parameter', 'ParameterName', 1);
 
 timeline.createLink('ActionStatement', 'UserEvtElement', 1);
 
-renderer.render(d3.select('svg'));
+const svg = d3.select('svg');
+renderer.render(svg);
