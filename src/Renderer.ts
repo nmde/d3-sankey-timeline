@@ -420,7 +420,8 @@ export default class Renderer {
       // TODO: Make this renderer-agnostic
       .on('mouseover', (event, d) => {
         let shortestPath: number[] = [];
-        this.timeline.getPath(d.id).forEach((path) => {
+        const paths: number[][] = this.timeline.getPath(d.id);
+        paths.forEach((path) => {
           if (shortestPath.length === 0 || path.length < shortestPath.length) {
             shortestPath = path;
           }
@@ -428,7 +429,7 @@ export default class Renderer {
         const { options } = this;
         selectAll('.node').each(function (n) {
           const node = n as TimelineNode;
-          if (shortestPath.indexOf(node.id) < 0) {
+          if (paths.flat().indexOf(node.id) < 0) {
             select(this)
               .transition(
                 // @ts-ignore
@@ -439,7 +440,10 @@ export default class Renderer {
               .style('opacity', options.fadeOpacity);
           }
         });
-        const pathLinks = this.timeline.getLinksInPath(shortestPath);
+        const pathLinks: number[] = [];
+        paths.forEach((path) => {
+          pathLinks.push(...this.timeline.getLinksInPath(path));
+        });
         selectAll('.link').each(function (l) {
           const link = l as TimelineLink;
           if (pathLinks.indexOf(link.id) < 0) {

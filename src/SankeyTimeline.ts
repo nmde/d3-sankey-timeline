@@ -140,18 +140,22 @@ export default class SankeyTimeline {
    * Gets the possible paths of nodes leading to the node with the given ID.
    *
    * @param id - The node to get the path for.
+   * @param exclude - Used for recursion.
    * @returns The possible paths to the node.
    */
-  public getPath(id: number): number[][] {
+  public getPath(id: number, exclude: number[] = []): number[][] {
     const target = this.nodes[id];
     const possiblePaths: number[][] = [];
     if (target.incomingLinks.length === 0) {
       possiblePaths.push([id]);
     } else {
       target.incomingLinks
-        .filter((link) => !link.isCircular)
+        .filter((link) => exclude.indexOf(link.id) < 0)
         .forEach((link) => {
-          this.getPath(link.source.id).forEach((path) => {
+          if (link.isCircular) {
+            exclude.push(link.id);
+          }
+          this.getPath(link.source.id, exclude).forEach((path) => {
             possiblePaths.push([id].concat(path));
           });
         });

@@ -9,6 +9,7 @@ renderer.options.maxNodeHeight = 38;
 renderer.options.maxLinkWidth = 5;
 renderer.options.layout = 'fixed';
 renderer.options.fontSize = 18;
+renderer.options.fadeOpacity = 0.1;
 
 timeline.createNode('Program', {
   endTime: 1,
