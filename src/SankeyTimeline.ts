@@ -8,7 +8,7 @@ import { getKeyTimes } from './util';
  * Creates a Sankey diagram along a timeline.
  */
 export default class SankeyTimeline {
-  private keyTimes: number[] = [];
+  public keyTimes: number[] = [];
 
   private links: Record<number, TimelineLink> = {};
 

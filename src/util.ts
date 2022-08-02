@@ -18,14 +18,13 @@ export function hasDist(times: NodeTimes): boolean {
  * @param times - The time configuration.
  * @returns The key start/end times.
  */
-export function getKeyTimes(times: NodeTimes): [number, number] {
-  if (hasDist(times)) {
-    return [
-      (times.meanTime as number) - (times.stdDeviation as number),
-      (times.meanTime as number) + (times.stdDeviation as number),
-    ];
+export function getKeyTimes(times: NodeTimes): number[] {
+  const keyTimes = [times.startTime, times.endTime];
+  if (times.meanTime && times.stdDeviation) {
+    keyTimes.push(times.meanTime - times.stdDeviation);
+    keyTimes.push(times.meanTime + times.stdDeviation);
   }
-  return [times.startTime, times.endTime];
+  return keyTimes.sort((a, b) => a - b);
 }
 
 /**

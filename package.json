@@ -61,7 +61,6 @@
     "d3-scale": "^4.0.2",
     "d3-selection": "^3.0.0",
     "d3-transition": "^3.0.1",
-    "elementary-circuits-directed-graph": "^1.3.1",
-    "flo-bezier3": "^4.0.1"
+    "elementary-circuits-directed-graph": "^1.3.1"
   }
 }

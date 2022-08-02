@@ -24,6 +24,8 @@ export default class TimelineNode {
 
   public outgoingLinks: TimelineLink[] = [];
 
+  public textHeight = 0;
+
   public times: NodeTimes;
 
   /**

@@ -3,7 +3,7 @@
 const timeline = new sankeyTimeline.SankeyTimeline();
 const { data } = window;
 const renderer = new sankeyTimeline.Renderer(timeline);
-renderer.options.height = 1085;
+renderer.options.height = 830;
 renderer.options.dynamicNodeHeight = true;
 renderer.options.layout = 'fixed';
 
@@ -20,6 +20,8 @@ function timestampToSeconds(timestamp) {
   const t = timestamp.split(':').map((x) => Number(x));
   return t[2] + t[1] * 60 + t[0] * 3600;
 }
+
+renderer.options.nodeTitle = (d) => `Name: ${d.label}\nCount: ${d.data.count}\nRate 5th: ${d.data.cRate5th}\nRate 95th: ${d.data.cRate95th}\nContribution Rate: ${d.data.contributionRate}\nMin Time: ${d.data.timeMin}\nMax Time: ${d.data.timeMax}\nMean Time: ${d.data.timeMean} (${timestampToSeconds(d.data.timeMean)} s)\nStandard Deviation: ${d.data.timeStdDeviation}`;
 
 /**
  * Process a step in a path.
@@ -61,12 +63,17 @@ data.keyStates.forEach((keyState) => {
 // Create corresponding nodes timeline.
 Object.keys(nodes).forEach((n) => {
   const node = nodes[n];
+  let start = timestampToSeconds(node.timeMean) - 2500;
+  if (start < 0) {
+    start = 0;
+  }
   nodes[n].timelineNode = timeline.createNode(node.name, {
-    endTime: timestampToSeconds(node.timeMax),
+    endTime: timestampToSeconds(node.timeMean) + 2500,
     meanTime: timestampToSeconds(node.timeMean),
-    startTime: timestampToSeconds(node.timeMin),
+    startTime: start,
     stdDeviation: timestampToSeconds(node.timeStdDeviation),
   });
+  nodes[n].timelineNode.data = node;
 });
 
 // Now that the TimelineNodes have been created, create links between them.

@@ -2897,13 +2897,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"big-float-ts@npm:^3.0.2":
-  version: 3.0.2
-  resolution: "big-float-ts@npm:3.0.2"
-  checksum: 5ebf4f479e1a509e4d421d1c9afbc7b5b2c169adb3c33475b19b00dd2587ee780a1d49bd479debcb0736109e8e8e7871760e0036f6e957a91f93a5873fc589d5
-  languageName: node
-  linkType: hard
-
 "big.js@npm:^5.2.2":
   version: 5.2.2
   resolution: "big.js@npm:5.2.2"
@@ -3415,7 +3408,6 @@ __metadata:
     eslint-plugin-jsdoc: ^39.3.3
     eslint-plugin-sort-class-members: ^1.14.1
     eslint-plugin-tsdoc: ^0.2.16
-    flo-bezier3: ^4.0.1
     jest: ^28.1.1
     jest-extended: ^2.0.0
     nmde-common: "https://github.com/nmde/nmde-common.git#0065f98ba13a23b81035f216e0b8396016610cf1"
@@ -3607,13 +3599,6 @@ __metadata:
   dependencies:
     esutils: ^2.0.2
   checksum: fd7673ca77fe26cd5cba38d816bc72d641f500f1f9b25b83e8ce28827fe2da7ad583a8da26ab6af85f834138cf8dae9f69b0cd6ab925f52ddab1754db44d99ce
-  languageName: node
-  linkType: hard
-
-"double-double@npm:^2.0.6":
-  version: 2.0.6
-  resolution: "double-double@npm:2.0.6"
-  checksum: 35a504684392c0e36cf2942a7f46e61c73527c44f42224bef4d7781f658c6b46da44ce7b1e0105af1272988aee0e539c9c702d0f811d0d995044fd94d25ca818
   languageName: node
   linkType: hard
 
@@ -4312,55 +4297,6 @@ __metadata:
   version: 3.2.5
   resolution: "flatted@npm:3.2.5"
   checksum: 3c436e9695ccca29620b4be5671dd72e5dd0a7500e0856611b7ca9bd8169f177f408c3b9abfa78dfe1493ee2d873e2c119080a8a9bee4e1a186a9e60ca6c89f1
-  languageName: node
-  linkType: hard
-
-"flo-bezier3@npm:^4.0.1":
-  version: 4.0.1
-  resolution: "flo-bezier3@npm:4.0.1"
-  dependencies:
-    big-float-ts: ^3.0.2
-    double-double: ^2.0.6
-    flo-gauss-quadrature: ^2.1.1
-    flo-graham-scan: ^2.0.1
-    flo-poly: ^6.0.4
-    flo-vector2d: ^4.0.1
-  checksum: 7a3b23b913674011de86c9faf5aec09b8bd15c6301a984f853df349cdcce5a3af79ca72d94021f9bbf01f8af1aca901c9b6e6a31147d1e730eb6b711ccd0f288
-  languageName: node
-  linkType: hard
-
-"flo-gauss-quadrature@npm:^2.1.1":
-  version: 2.1.1
-  resolution: "flo-gauss-quadrature@npm:2.1.1"
-  checksum: 8f83c98c132bada394d15de231bad028ff8d6e26296a99b8d9ad400b964c2c420faa8a32cb5dee183348bfa8f15f3d0f69e85f4640242b4c2bca5e49ef786fa4
-  languageName: node
-  linkType: hard
-
-"flo-graham-scan@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "flo-graham-scan@npm:2.0.1"
-  dependencies:
-    big-float-ts: ^3.0.2
-  checksum: 81dcde46549ec1536d5d685b4af19de2c46f930f90e95779b24eb67a9094ea2496405ee90f3065988a4f14489bdc9998acaa33dae6fb4dfee01cc6b85e7e9927
-  languageName: node
-  linkType: hard
-
-"flo-poly@npm:^6.0.4":
-  version: 6.0.4
-  resolution: "flo-poly@npm:6.0.4"
-  dependencies:
-    big-float-ts: ^3.0.2
-    double-double: ^2.0.6
-  checksum: 3235c9e6a5fbce1cd8376f0e8dfa482000cae57019b7a89a595ca48c79e808a8a9d26d74d6a3777391754af1166e9728d8fe1010fb6b62a18d54953ccd69ea33
-  languageName: node
-  linkType: hard
-
-"flo-vector2d@npm:^4.0.1":
-  version: 4.0.1
-  resolution: "flo-vector2d@npm:4.0.1"
-  dependencies:
-    big-float-ts: ^3.0.2
-  checksum: e48ead56b4c879ea97773f849622071e0f0cdfc504b740154166cb3f456967f618d6f6247963f9a9f9622489f19543299182f06420425b36499760231202f6e9
   languageName: node
   linkType: hard
 

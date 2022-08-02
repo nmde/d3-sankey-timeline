@@ -62,7 +62,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-plugin-jsdoc", "virtual:2ec16778ec8d3fa318ec65f0b01ad42f2afe652a7eb8f17308aa0f1b844ef6cee69055b54cf62c418781e10a0dbbf011742aaa9a8a78508b6858ea64ed5afc91#npm:39.3.3"],\
             ["eslint-plugin-sort-class-members", "virtual:2ec16778ec8d3fa318ec65f0b01ad42f2afe652a7eb8f17308aa0f1b844ef6cee69055b54cf62c418781e10a0dbbf011742aaa9a8a78508b6858ea64ed5afc91#npm:1.14.1"],\
             ["eslint-plugin-tsdoc", "npm:0.2.16"],\
-            ["flo-bezier3", "npm:4.0.1"],\
             ["jest", "virtual:cd6c56a667f71c219ece2fa9e5c888802ce463320a6e0d3b7f7787f2b175086075bde39e5a8e63af7c8444aee676f143792f2dcb05181d1861fa80ef97da30da#npm:28.1.1"],\
             ["jest-extended", "virtual:2ec16778ec8d3fa318ec65f0b01ad42f2afe652a7eb8f17308aa0f1b844ef6cee69055b54cf62c418781e10a0dbbf011742aaa9a8a78508b6858ea64ed5afc91#npm:2.0.0"],\
             ["nmde-common", "https://github.com/nmde/nmde-common.git#commit=0065f98ba13a23b81035f216e0b8396016610cf1"],\
@@ -4762,15 +4761,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
-      ["big-float-ts", [\
-        ["npm:3.0.2", {\
-          "packageLocation": "./.yarn/cache/big-float-ts-npm-3.0.2-60ae1f2a5e-5ebf4f479e.zip/node_modules/big-float-ts/",\
-          "packageDependencies": [\
-            ["big-float-ts", "npm:3.0.2"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
       ["big.js", [\
         ["npm:5.2.2", {\
           "packageLocation": "./.yarn/cache/big.js-npm-5.2.2-e147c30820-b89b6e8419.zip/node_modules/big.js/",\
@@ -5360,7 +5350,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-plugin-jsdoc", "virtual:2ec16778ec8d3fa318ec65f0b01ad42f2afe652a7eb8f17308aa0f1b844ef6cee69055b54cf62c418781e10a0dbbf011742aaa9a8a78508b6858ea64ed5afc91#npm:39.3.3"],\
             ["eslint-plugin-sort-class-members", "virtual:2ec16778ec8d3fa318ec65f0b01ad42f2afe652a7eb8f17308aa0f1b844ef6cee69055b54cf62c418781e10a0dbbf011742aaa9a8a78508b6858ea64ed5afc91#npm:1.14.1"],\
             ["eslint-plugin-tsdoc", "npm:0.2.16"],\
-            ["flo-bezier3", "npm:4.0.1"],\
             ["jest", "virtual:cd6c56a667f71c219ece2fa9e5c888802ce463320a6e0d3b7f7787f2b175086075bde39e5a8e63af7c8444aee676f143792f2dcb05181d1861fa80ef97da30da#npm:28.1.1"],\
             ["jest-extended", "virtual:2ec16778ec8d3fa318ec65f0b01ad42f2afe652a7eb8f17308aa0f1b844ef6cee69055b54cf62c418781e10a0dbbf011742aaa9a8a78508b6858ea64ed5afc91#npm:2.0.0"],\
             ["nmde-common", "https://github.com/nmde/nmde-common.git#commit=0065f98ba13a23b81035f216e0b8396016610cf1"],\
@@ -5622,15 +5611,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["doctrine", "npm:3.0.0"],\
             ["esutils", "npm:2.0.3"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
-      ["double-double", [\
-        ["npm:2.0.6", {\
-          "packageLocation": "./.yarn/cache/double-double-npm-2.0.6-31e26a1116-35a5046843.zip/node_modules/double-double/",\
-          "packageDependencies": [\
-            ["double-double", "npm:2.0.6"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -6660,61 +6640,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/flatted-npm-3.2.5-0ee5a8875f-3c436e9695.zip/node_modules/flatted/",\
           "packageDependencies": [\
             ["flatted", "npm:3.2.5"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
-      ["flo-bezier3", [\
-        ["npm:4.0.1", {\
-          "packageLocation": "./.yarn/cache/flo-bezier3-npm-4.0.1-c6b997e408-7a3b23b913.zip/node_modules/flo-bezier3/",\
-          "packageDependencies": [\
-            ["flo-bezier3", "npm:4.0.1"],\
-            ["big-float-ts", "npm:3.0.2"],\
-            ["double-double", "npm:2.0.6"],\
-            ["flo-gauss-quadrature", "npm:2.1.1"],\
-            ["flo-graham-scan", "npm:2.0.1"],\
-            ["flo-poly", "npm:6.0.4"],\
-            ["flo-vector2d", "npm:4.0.1"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
-      ["flo-gauss-quadrature", [\
-        ["npm:2.1.1", {\
-          "packageLocation": "./.yarn/cache/flo-gauss-quadrature-npm-2.1.1-d0df1c1f8a-8f83c98c13.zip/node_modules/flo-gauss-quadrature/",\
-          "packageDependencies": [\
-            ["flo-gauss-quadrature", "npm:2.1.1"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
-      ["flo-graham-scan", [\
-        ["npm:2.0.1", {\
-          "packageLocation": "./.yarn/cache/flo-graham-scan-npm-2.0.1-2eb11c47dd-81dcde4654.zip/node_modules/flo-graham-scan/",\
-          "packageDependencies": [\
-            ["flo-graham-scan", "npm:2.0.1"],\
-            ["big-float-ts", "npm:3.0.2"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
-      ["flo-poly", [\
-        ["npm:6.0.4", {\
-          "packageLocation": "./.yarn/cache/flo-poly-npm-6.0.4-9a5aeb10bc-3235c9e6a5.zip/node_modules/flo-poly/",\
-          "packageDependencies": [\
-            ["flo-poly", "npm:6.0.4"],\
-            ["big-float-ts", "npm:3.0.2"],\
-            ["double-double", "npm:2.0.6"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
-      ["flo-vector2d", [\
-        ["npm:4.0.1", {\
-          "packageLocation": "./.yarn/cache/flo-vector2d-npm-4.0.1-6ffbd75b70-e48ead56b4.zip/node_modules/flo-vector2d/",\
-          "packageDependencies": [\
-            ["flo-vector2d", "npm:4.0.1"],\
-            ["big-float-ts", "npm:3.0.2"]\
           ],\
           "linkType": "HARD"\
         }]\

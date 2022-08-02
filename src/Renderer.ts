@@ -3,9 +3,8 @@ import { color, HSLColor, RGBColor } from 'd3-color';
 import { easeCubicIn } from 'd3-ease';
 import { interpolateHsl } from 'd3-interpolate';
 import { scaleLinear } from 'd3-scale';
-import { select, selectAll } from 'd3-selection';
-import { transition } from 'd3-transition';
-import { bezierBezierIntersectionFast, evalDeCasteljau } from 'flo-bezier3';
+import { BaseType, select, selectAll } from 'd3-selection';
+import { Transition, transition } from 'd3-transition';
 import SankeyTimeline from './SankeyTimeline';
 import type TimelineLink from './TimelineLink';
 import TimelineNode from './TimelineNode';
@@ -13,7 +12,6 @@ import type { TimelineGraph } from './types';
 import { getKeyTimes, hasDist } from './util';
 
 // The typings for d3-transition are incompatible with d3-selection, so we have to use ts-ignore when using transitions.
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 
 /**
  * Renders the chart using D3.
@@ -40,8 +38,12 @@ export default class Renderer {
     height: window.innerHeight,
     layout: 'default',
     margin: 100,
+    marginTop: 25,
     maxLinkWidth: 50,
     maxNodeHeight: 100,
+    meanBarColor: 'rgba(0,0,0,0.25)',
+    meanBarWidth: 3,
+    nodeTitle: (d: TimelineNode): string => d.label,
     startColor: 'purple',
     transitionSpeed: 75,
     width: window.innerWidth,
@@ -112,11 +114,15 @@ export default class Renderer {
       if (hasDist(node.times) && this.options.distributions) {
         node.layout.distribution = [
           {
-            x: this.getTimeX(node.times.startTime),
+            x: this.getTimeX(
+              (node.times.meanTime || 0) - (node.times.stdDeviation || 0),
+            ),
             y: node.layout.y,
           },
           {
-            x: this.getTimeX(node.times.endTime),
+            x: this.getTimeX(
+              (node.times.meanTime || 0) + (node.times.stdDeviation || 0),
+            ),
             y: node.layout.y,
           },
         ];
@@ -132,108 +138,31 @@ export default class Renderer {
    */
   public calculateLayout(): TimelineGraph {
     this.graph = this.timeline.graph;
-    if (this.options.layout === 'fixed') {
-      this.initializeLayout();
-      const rows: TimelineNode[][] = [];
-      const placed: number[] = [];
-      this.graph.nodes.forEach((node) => {
-        if (placed.indexOf(node.id) < 0) {
-          rows.push([]);
-          this.findNodeOverlaps(node)
-            .map((overlap) => overlap.node)
-            .forEach((o) => {
-              rows[rows.length - 1].push(o);
-              placed.push(o.id);
-            });
-        }
-      });
-      rows.forEach((row) => {
-        const columnHeight = this.options.height / row.length;
-        for (let col = 0; col < row.length; col += 1) {
-          this.graph.nodes[row[col].id].layout.y = col * columnHeight;
-        }
-      });
-      this.calculateLinkPaths();
-      this.calculateDistributionLayout();
-      return this.graph;
-    }
-    this.minY = 0;
-    // First pass - initial placements based only on instrinsic properties
-    // TODO - save x1 in layout
     this.initializeLayout();
-    // Second pass - Adjust X and Y coordinates to try and minimize overlapping nodes
-    this.preventNodeOverlaps();
-    // Calculate initial link positions
-    this.calculateLinkPaths();
-    // Third pass - Adjust nodes to prevent nodes from overlapping with links
-    this.preventLinkOverlaps();
-    // Prevent overlaps with the new positions
-    this.preventNodeOverlaps();
-    // Fourth pass - Keep nodes from going off the screen and add additional graph elements
-    let maxY = 0;
+    const rows: TimelineNode[][] = [];
+    const placed: number[] = [];
     this.graph.nodes.forEach((node) => {
-      node.layout.y -= this.minY;
-      if (node.layout.y + node.layout.height > maxY) {
-        maxY = node.layout.y + node.layout.height;
-      }
-    });
-    this.graph.nodes.forEach((node) => {
-      node.layout.y = this.options.height * (node.layout.y / maxY);
-      if (node.layout.y + node.layout.height > this.options.height) {
-        node.layout.y = this.options.height - node.layout.height;
-      }
-    });
-    this.calculateDistributionLayout();
-    // Calculate final link positions
-    this.calculateLinkPaths();
-    return this.graph;
-  }
-
-  /**
-   * Calculates the points at which links cross into nodes.
-   *
-   * @param node - The node to find overlaps for.
-   * @returns The intersecting points.
-   */
-  private findLinkOverlaps(node: TimelineNode) {
-    const topLeft = [node.layout.x, node.layout.y];
-    const topRight = [node.layout.x + node.layout.width, node.layout.y];
-    const bottomLeft = [node.layout.x, node.layout.y + node.layout.height];
-    const bottomRight = [
-      node.layout.x + node.layout.width,
-      node.layout.y + node.layout.height,
-    ];
-    const linkOverlaps: number[] = [];
-    const intersections: number[][][][] = [];
-    Object.values(this.graph.links)
-      // TODO: handle self linking?
-      .filter((link) => !link.isSelfLinking)
-      .forEach((link) => {
-        [
-          [topLeft, topLeft, topRight, topRight],
-          [bottomRight, bottomRight, bottomLeft, bottomLeft],
-        ].forEach((boxCurve) => {
-          [
-            link.layout.curve.map((point) => [
-              point[0] - link.layout.width / 2,
-              point[1],
-            ]),
-            link.layout.curve.map((point) => [
-              point[0] + link.layout.width / 2,
-              point[1],
-            ]),
-          ].forEach((linkCurve) => {
-            const i = bezierBezierIntersectionFast(boxCurve, linkCurve);
-            if (i.length > 0 && linkOverlaps.indexOf(link.id) < 0) {
-              linkOverlaps.push(link.id);
-              intersections.push(
-                i.map((j) => j.map((k) => evalDeCasteljau(boxCurve, k))),
-              );
-            }
+      if (placed.indexOf(node.id) < 0) {
+        rows.push([]);
+        this.findNodeOverlaps(node)
+          .map((overlap) => overlap.node)
+          .forEach((o) => {
+            rows[rows.length - 1].push(o);
+            placed.push(o.id);
           });
-        });
-      });
-    return intersections;
+      }
+    });
+    rows.forEach((row) => {
+      const columnHeight =
+        (this.options.height - this.options.marginTop) / row.length;
+      for (let col = 0; col < row.length; col += 1) {
+        this.graph.nodes[row[col].id].layout.y =
+          col * columnHeight + this.options.marginTop;
+      }
+    });
+    this.calculateLinkPaths();
+    this.calculateDistributionLayout();
+    return this.graph;
   }
 
   /**
@@ -276,11 +205,17 @@ export default class Renderer {
       if (this.options.distributions) {
         keyTimes = getKeyTimes(node.times);
       }
-      const x = this.getTimeX(keyTimes[0]);
+      const x = this.getTimeX(node.times.meanTime || 0);
+      console.log(node.times);
+      console.log(keyTimes);
+      console.log(x);
+      /*
       let width = this.getTimeX(keyTimes[1]) - x;
       if (Number.isNaN(width)) {
         width = 0;
       }
+      */
+      const width = node.layout.width;
       let height = this.options.maxNodeHeight;
       if (this.options.dynamicNodeHeight) {
         height *= node.size / this.timeline.maxSize;
@@ -291,54 +226,6 @@ export default class Renderer {
         x,
         y: 0,
       };
-    });
-  }
-
-  /**
-   * Adjusts nodes to prevent overlaps between nodes and links.
-   */
-  private preventLinkOverlaps() {
-    this.graph.nodes.forEach((node, n) => {
-      let shiftUp = 0;
-      let shiftDown = 0;
-      this.findLinkOverlaps(node).forEach((overlaps) => {
-        overlaps.forEach((curve) => {
-          curve
-            .map((p) => p.map((q) => Number(q.toFixed(2))))
-            .forEach((point) => {
-              if (point[1] < node.layout.y + node.layout.height / 2) {
-                shiftUp += node.layout.y + node.layout.height / 2 - point[1];
-              } else if (point[1] > node.layout.y + node.layout.height / 2) {
-                shiftDown += node.layout.y + node.layout.height / 2 + point[1];
-              } else {
-                // console.log(point);
-              }
-            });
-        });
-      });
-      this.graph.nodes[n].layout.y += shiftUp - shiftDown;
-    });
-  }
-
-  /**
-   * Adjusts nodes so they don't overlap with other nodes.
-   */
-  private preventNodeOverlaps() {
-    this.graph.nodes.forEach((node, n) => {
-      // TODO: m < n
-      let minY = node.layout.y;
-      this.findNodeOverlaps(node)
-        .map((overlap) => overlap.range)
-        .sort((a, b) => a[0] - b[0])
-        .forEach((overlap) => {
-          if (minY >= overlap[0] && minY <= overlap[1]) {
-            [, minY] = overlap;
-          }
-        });
-      this.graph.nodes[n].layout.y = minY;
-      if (minY < this.minY) {
-        this.minY = minY;
-      }
     });
   }
 
@@ -357,7 +244,26 @@ export default class Renderer {
    * @param svg - The SVG element to render within.
    */
   public render(svg: ReturnType<typeof select>): void {
+    // Create labels
+    svg
+      .append('g')
+      .selectAll('g')
+      .data(this.timeline.graph.nodes)
+      .join('g')
+      .append('text')
+      .data(this.timeline.graph.nodes)
+      .attr('text-anchor', 'middle')
+      .attr('dominant-baseline', 'middle')
+      .style('fill', this.options.fontColor)
+      .style('font-size', `${this.options.fontSize}px`)
+      .text((d) => d.label)
+      .each(function (d) {
+        d.textHeight = this.getBBox().height;
+        d.layout.width = this.getBBox().width;
+      });
+
     const graph = this.calculateLayout();
+    console.log(this.timeline.keyTimes);
 
     // Create the graph element
     svg
@@ -407,6 +313,7 @@ export default class Renderer {
       .text((d) => `${d.source.label} → ${d.target.label}\n${d.flow}`);
 
     // Create nodes
+    type TransitionType = Transition<BaseType, null, null, undefined>;
     const nodes = svg
       .append('g')
       .selectAll('g')
@@ -432,10 +339,9 @@ export default class Renderer {
           if (paths.flat().indexOf(node.id) < 0) {
             select(this)
               .transition(
-                // @ts-ignore
                 transition()
                   .duration(options.transitionSpeed)
-                  .ease(easeCubicIn),
+                  .ease(easeCubicIn) as any as TransitionType,
               )
               .style('opacity', options.fadeOpacity);
           }
@@ -449,10 +355,9 @@ export default class Renderer {
           if (pathLinks.indexOf(link.id) < 0) {
             select(this)
               .transition(
-                // @ts-ignore
                 transition()
                   .duration(options.transitionSpeed)
-                  .ease(easeCubicIn),
+                  .ease(easeCubicIn) as any as TransitionType,
               )
               .style('opacity', options.fadeOpacity);
           }
@@ -461,10 +366,9 @@ export default class Renderer {
       .on('mouseleave', () => {
         selectAll('.node, .link')
           .transition(
-            // @ts-ignore
             transition()
               .duration(this.options.transitionSpeed)
-              .ease(easeCubicIn),
+              .ease(easeCubicIn) as any as TransitionType,
           )
           .style('opacity', 1);
       });
@@ -475,6 +379,7 @@ export default class Renderer {
       .attr('y', (d) => d.layout.y)
       .attr('height', (d) => d.layout.height)
       .attr('width', (d) => d.layout.width);
+    nodes.append('title').text((d) => this.options.nodeTitle(d));
 
     // Left handle
     nodes
@@ -536,16 +441,25 @@ export default class Renderer {
       })
       .attr('fill', (d) => gradient(d.id / graph.nodes.length));
 
-    // Create labels
+    // Mean value bar
+    nodes
+      .append('rect')
+      .attr('x', (d) => d.layout.x + d.layout.width / 2)
+      .attr('y', (d) => d.layout.y - this.options.meanBarWidth)
+      .attr('width', this.options.meanBarWidth)
+      .attr('height', (d) => d.layout.height + this.options.meanBarWidth * 2)
+      .attr('fill', this.options.meanBarColor);
+
+    // Visible labels
     nodes
       .append('text')
-      .attr('x', (d) => d.layout.x + d.layout.width / 2)
-      .attr('y', (d) => d.layout.y + d.layout.height / 2)
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'middle')
       .style('fill', this.options.fontColor)
       .style('font-size', `${this.options.fontSize}px`)
-      .text((d) => d.label);
+      .text((d) => d.label)
+      .attr('x', (d) => d.layout.x + d.layout.width / 2)
+      .attr('y', (d) => d.layout.y + d.layout.height / 2);
   }
 
   /**
