@@ -7,7 +7,7 @@ renderer.options.width = 1360;
 renderer.options.margin = 100;
 renderer.options.maxNodeHeight = 38;
 renderer.options.maxLinkWidth = 5;
-renderer.options.layout = 'fixed';
+renderer.options.layout = 0;
 renderer.options.fontSize = 18;
 renderer.options.fadeOpacity = 0.1;
 

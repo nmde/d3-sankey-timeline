@@ -36,7 +36,7 @@ export default class Renderer {
     fontColor: 'white',
     fontSize: 25,
     height: window.innerHeight,
-    layout: 'default',
+    layout: 0,
     margin: 100,
     marginTop: 25,
     maxLinkWidth: 50,
@@ -139,6 +139,28 @@ export default class Renderer {
   public calculateLayout(): TimelineGraph {
     this.graph = this.timeline.graph;
     this.initializeLayout();
+    if (this.options.layout === 1) {
+      this.graph.nodes.forEach((node) => {
+        let maxColumn = 0;
+        let maxRow = 0;
+        node.incomingLinks.forEach((link) => {
+          if (link.source.layout.column > maxColumn) {
+            maxColumn = link.source.layout.column;
+          }
+          if (link.source.layout.row > maxRow) {
+            maxRow = link.source.layout.row;
+          }
+        });
+        node.layout.column = maxColumn + 1;
+        node.layout.row = maxRow + 1;
+      });
+      this.graph.nodes.forEach((node) => {
+        node.layout.x = node.layout.width * node.layout.column;
+        node.layout.y = this.options.maxNodeHeight * node.layout.row;
+      });
+      this.calculateLinkPaths();
+      return this.graph;
+    }
     const rows: TimelineNode[][] = [];
     const placed: number[] = [];
     this.graph.nodes.forEach((node) => {
@@ -206,9 +228,7 @@ export default class Renderer {
         keyTimes = getKeyTimes(node.times);
       }
       const x = this.getTimeX(node.times.meanTime || 0);
-      console.log(node.times);
-      console.log(keyTimes);
-      console.log(x);
+      // TODO: Fix the positions
       /*
       let width = this.getTimeX(keyTimes[1]) - x;
       if (Number.isNaN(width)) {
@@ -221,7 +241,9 @@ export default class Renderer {
         height *= node.size / this.timeline.maxSize;
       }
       this.graph.nodes[n].layout = {
+        column: 0,
         height,
+        row: 0,
         width,
         x,
         y: 0,
@@ -263,7 +285,6 @@ export default class Renderer {
       });
 
     const graph = this.calculateLayout();
-    console.log(this.timeline.keyTimes);
 
     // Create the graph element
     svg
@@ -272,16 +293,18 @@ export default class Renderer {
       .style('height', this.options.height);
 
     // Use d3-axis to create an axis
-    svg
-      .append('g')
-      .style('width', '100%')
-      .call(
-        axisBottom(
-          scaleLinear()
-            .domain([this.timeline.minTime, this.timeline.maxTime])
-            .range(this.range),
-        ),
-      );
+    if (this.options.layout === 0) {
+      svg
+        .append('g')
+        .style('width', '100%')
+        .call(
+          axisBottom(
+            scaleLinear()
+              .domain([this.timeline.minTime, this.timeline.maxTime])
+              .range(this.range),
+          ),
+        );
+    }
 
     const gradient = interpolateHsl(
       color(this.options.startColor) as HSLColor,
@@ -381,74 +404,76 @@ export default class Renderer {
       .attr('width', (d) => d.layout.width);
     nodes.append('title').text((d) => this.options.nodeTitle(d));
 
-    // Left handle
-    nodes
-      .append('rect')
-      .attr('x', (d) => {
-        if (d.layout.distribution) {
-          return d.layout.distribution[0].x;
-        }
-        return 0;
-      })
-      .attr('y', (d) => {
-        if (d.layout.distribution) {
-          return d.layout.distribution[0].y;
-        }
-        return 0;
-      })
-      .attr('height', (d) => d.layout.height)
-      .attr('width', () => this.options.distHandleWidth)
-      .attr('fill', (d) => gradient(d.id / graph.nodes.length));
-    // Right handle
-    nodes
-      .append('rect')
-      .attr('x', (d) => {
-        if (d.layout.distribution) {
-          return d.layout.distribution[1].x;
-        }
-        return 0;
-      })
-      .attr('y', (d) => {
-        if (d.layout.distribution) {
-          return d.layout.distribution[1].y;
-        }
-        return 0;
-      })
-      .attr('height', (d) => d.layout.height)
-      .attr('width', () => this.options.distHandleWidth)
-      .attr('fill', (d) => gradient(d.id / graph.nodes.length));
-    // Center line
-    nodes
-      .append('rect')
-      .attr('x', (d) => {
-        if (d.layout.distribution) {
-          return d.layout.distribution[0].x;
-        }
-        return 0;
-      })
-      .attr('y', (d) => {
-        if (d.layout.distribution) {
-          return d.layout.y + d.layout.height / 2;
-        }
-        return 0;
-      })
-      .attr('height', () => this.options.distHandleWidth)
-      .attr('width', (d) => {
-        if (d.layout.distribution) {
-          return d.layout.distribution[1].x - d.layout.distribution[0].x;
-        }
-        return 0;
-      })
-      .attr('fill', (d) => gradient(d.id / graph.nodes.length));
+    if (this.options.layout === 0) {
+      // Left handle
+      nodes
+        .append('rect')
+        .attr('x', (d) => {
+          if (d.layout.distribution) {
+            return d.layout.distribution[0].x;
+          }
+          return 0;
+        })
+        .attr('y', (d) => {
+          if (d.layout.distribution) {
+            return d.layout.distribution[0].y;
+          }
+          return 0;
+        })
+        .attr('height', (d) => d.layout.height)
+        .attr('width', () => this.options.distHandleWidth)
+        .attr('fill', (d) => gradient(d.id / graph.nodes.length));
+      // Right handle
+      nodes
+        .append('rect')
+        .attr('x', (d) => {
+          if (d.layout.distribution) {
+            return d.layout.distribution[1].x;
+          }
+          return 0;
+        })
+        .attr('y', (d) => {
+          if (d.layout.distribution) {
+            return d.layout.distribution[1].y;
+          }
+          return 0;
+        })
+        .attr('height', (d) => d.layout.height)
+        .attr('width', () => this.options.distHandleWidth)
+        .attr('fill', (d) => gradient(d.id / graph.nodes.length));
+      // Center line
+      nodes
+        .append('rect')
+        .attr('x', (d) => {
+          if (d.layout.distribution) {
+            return d.layout.distribution[0].x;
+          }
+          return 0;
+        })
+        .attr('y', (d) => {
+          if (d.layout.distribution) {
+            return d.layout.y + d.layout.height / 2;
+          }
+          return 0;
+        })
+        .attr('height', () => this.options.distHandleWidth)
+        .attr('width', (d) => {
+          if (d.layout.distribution) {
+            return d.layout.distribution[1].x - d.layout.distribution[0].x;
+          }
+          return 0;
+        })
+        .attr('fill', (d) => gradient(d.id / graph.nodes.length));
 
-    // Mean value bar
-    nodes
-      .append('rect')
-      .attr('x', (d) => d.layout.x + d.layout.width / 2)
-      .attr('y', (d) => d.layout.y - this.options.meanBarWidth)
-      .attr('width', this.options.meanBarWidth)
-      .attr('height', (d) => d.layout.height + this.options.meanBarWidth * 2)
-      .attr('fill', this.options.meanBarColor);
+      // Mean value bar
+      nodes
+        .append('rect')
+        .attr('x', (d) => d.layout.x + d.layout.width / 2)
+        .attr('y', (d) => d.layout.y - this.options.meanBarWidth)
+        .attr('width', this.options.meanBarWidth)
+        .attr('height', (d) => d.layout.height + this.options.meanBarWidth * 2)
+        .attr('fill', this.options.meanBarColor);
+    }
 
     // Visible labels
     nodes

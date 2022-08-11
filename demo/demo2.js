@@ -8,7 +8,7 @@ renderer.options.margin = margin;
 renderer.options.width = window.innerWidth;
 renderer.options.height = 700;
 renderer.options.dynamicNodeHeight = true;
-renderer.options.layout = 'fixed';
+renderer.options.layout = 0;
 
 let v0;
 let v1;

@@ -16,7 +16,9 @@ export default class TimelineNode {
   public label: string;
 
   public layout: NodeLayout = {
+    column: 0,
     height: 0,
+    row: 0,
     width: 0,
     x: 0,
     y: 0,
