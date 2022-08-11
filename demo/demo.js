@@ -3,7 +3,7 @@
 const timeline = new sankeyTimeline.SankeyTimeline();
 const { data } = window;
 const renderer = new sankeyTimeline.Renderer(timeline);
-renderer.options.height = 830;
+renderer.options.height = 750;
 renderer.options.dynamicNodeHeight = true;
 renderer.options.layout = 1;
 

@@ -140,9 +140,11 @@ export default class Renderer {
     this.graph = this.timeline.graph;
     this.initializeLayout();
     if (this.options.layout === 1) {
+      let totalMaxColumn = 0;
+      let totalMaxRow = 0;
       this.graph.nodes.forEach((node) => {
-        let maxColumn = 0;
-        let maxRow = 0;
+        let maxColumn = -1;
+        let maxRow = -1;
         node.incomingLinks.forEach((link) => {
           if (link.source.layout.column > maxColumn) {
             maxColumn = link.source.layout.column;
@@ -153,10 +155,18 @@ export default class Renderer {
         });
         node.layout.column = maxColumn + 1;
         node.layout.row = maxRow + 1;
+        if (maxColumn > totalMaxColumn) {
+          totalMaxColumn = maxColumn;
+        }
+        if (maxRow > totalMaxRow) {
+          totalMaxRow = maxRow;
+        }
       });
       this.graph.nodes.forEach((node) => {
-        node.layout.x = node.layout.width * node.layout.column;
-        node.layout.y = this.options.maxNodeHeight * node.layout.row;
+        node.layout.x =
+          (node.layout.column / (totalMaxColumn + 2)) * this.options.width;
+        node.layout.y =
+          (node.layout.row / (totalMaxRow + 2)) * this.options.height;
       });
       this.calculateLinkPaths();
       return this.graph;
