@@ -1,5 +1,6 @@
 import { axisBottom } from 'd3-axis';
 import { color, HSLColor, RGBColor } from 'd3-color';
+import { drag } from 'd3-drag';
 import { easeCubicIn } from 'd3-ease';
 import { interpolateHsl } from 'd3-interpolate';
 import { scaleLinear } from 'd3-scale';
@@ -347,6 +348,7 @@ export default class Renderer {
 
     // Create nodes
     type TransitionType = Transition<BaseType, null, null, undefined>;
+    const { options } = this;
     const nodes = svg
       .append('g')
       .selectAll('g')
@@ -366,7 +368,6 @@ export default class Renderer {
             shortestPath = path;
           }
         });
-        const { options } = this;
         selectAll('.node').each(function (n) {
           const node = n as TimelineNode;
           if (paths.flat().indexOf(node.id) < 0) {
@@ -404,7 +405,51 @@ export default class Renderer {
               .ease(easeCubicIn) as any as TransitionType,
           )
           .style('opacity', 1);
-      });
+      })
+      .call(
+        drag<any, TimelineNode>()
+          .on('drag', (event, d) => {
+            if (options.layout !== 0) {
+              d.layout.x = event.x;
+            }
+            d.layout.y = event.y;
+          })
+          .on('drag.update', () => {
+            selectAll<BaseType, TimelineNode>('.node').each(function (d) {
+              const element = select(this);
+              element
+                .select('rect')
+                .attr('x', () => d.layout.x)
+                .attr('y', () => d.layout.y);
+              element
+                .select('text')
+                .attr('x', () => d.layout.x + d.layout.width / 2)
+                .attr('y', () => d.layout.y + d.layout.height / 2);
+              element
+                .select('.meanValue')
+                .attr('x', () => d.layout.x + d.layout.width / 2)
+                .attr('y', () => d.layout.y - options.meanBarWidth);
+              
+              selectAll<BaseType, TimelineLink>('.link').each(function (l) {
+                const path = l.layout.path.substring(1).split(',');
+                if (l.source.id === d.id) {
+                  l.layout.path = `M${d.layout.x + d.layout.width},${
+                    d.layout.y + d.layout.height / 2
+                  }C${d.layout.x + d.layout.width + options.curveWidth},${
+                    d.layout.y + d.layout.height / 2
+                  },${path[3]},${path[4]},${path[5]},${path[6]}`;
+                } else if (l.target.id === d.id) {
+                  l.layout.path = `M${path[0]},${path[1].split('C')[0]}C${
+                    path[1].split('C')[1]
+                  },${path[2]},${d.layout.x - options.curveWidth},${
+                    d.layout.y + d.layout.height / 2
+                  },${d.layout.x},${d.layout.y + d.layout.height / 2}`;
+                }
+                select(this).select('path').attr('d', l.layout.path);
+              });
+            });
+          }),
+      );
     nodes
       .append('rect')
       .attr('fill', (d) => gradient(d.id / graph.nodes.length))
@@ -430,6 +475,7 @@ export default class Renderer {
           }
           return 0;
         })
+        .attr('class', 'distHandleLeft')
         .attr('height', (d) => d.layout.height)
         .attr('width', () => this.options.distHandleWidth)
         .attr('fill', (d) => gradient(d.id / graph.nodes.length));
@@ -448,6 +494,7 @@ export default class Renderer {
           }
           return 0;
         })
+        .attr('class', 'distHandleRight')
         .attr('height', (d) => d.layout.height)
         .attr('width', () => this.options.distHandleWidth)
         .attr('fill', (d) => gradient(d.id / graph.nodes.length));
@@ -466,6 +513,7 @@ export default class Renderer {
           }
           return 0;
         })
+        .attr('class', 'distHandleCenter')
         .attr('height', () => this.options.distHandleWidth)
         .attr('width', (d) => {
           if (d.layout.distribution) {
@@ -480,6 +528,7 @@ export default class Renderer {
         .append('rect')
         .attr('x', (d) => d.layout.x + d.layout.width / 2)
         .attr('y', (d) => d.layout.y - this.options.meanBarWidth)
+        .attr('class', 'meanValue')
         .attr('width', this.options.meanBarWidth)
         .attr('height', (d) => d.layout.height + this.options.meanBarWidth * 2)
         .attr('fill', this.options.meanBarColor);
@@ -490,6 +539,7 @@ export default class Renderer {
       .append('text')
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'middle')
+      .attr('class', 'label')
       .style('fill', this.options.fontColor)
       .style('font-size', `${this.options.fontSize}px`)
       .text((d) => d.label)

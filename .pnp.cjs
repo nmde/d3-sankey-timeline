@@ -38,6 +38,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/preset-env", "virtual:cd6c56a667f71c219ece2fa9e5c888802ce463320a6e0d3b7f7787f2b175086075bde39e5a8e63af7c8444aee676f143792f2dcb05181d1861fa80ef97da30da#npm:7.18.2"],\
             ["@types/d3-axis", "npm:3.0.1"],\
             ["@types/d3-color", "npm:3.1.0"],\
+            ["@types/d3-drag", "npm:3.0.1"],\
             ["@types/d3-ease", "npm:3.0.0"],\
             ["@types/d3-interpolate", "npm:3.0.1"],\
             ["@types/d3-scale", "npm:4.0.2"],\
@@ -50,6 +51,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["babel-loader", "virtual:2ec16778ec8d3fa318ec65f0b01ad42f2afe652a7eb8f17308aa0f1b844ef6cee69055b54cf62c418781e10a0dbbf011742aaa9a8a78508b6858ea64ed5afc91#npm:8.2.5"],\
             ["d3-axis", "npm:3.0.0"],\
             ["d3-color", "npm:3.1.0"],\
+            ["d3-drag", "npm:3.0.0"],\
             ["d3-ease", "npm:3.0.1"],\
             ["d3-interpolate", "npm:3.0.1"],\
             ["d3-scale", "npm:4.0.2"],\
@@ -3192,6 +3194,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["@types/d3-drag", [\
+        ["npm:3.0.1", {\
+          "packageLocation": "./.yarn/cache/@types-d3-drag-npm-3.0.1-29aa2034bb-d83b66cd2e.zip/node_modules/@types/d3-drag/",\
+          "packageDependencies": [\
+            ["@types/d3-drag", "npm:3.0.1"],\
+            ["@types/d3-selection", "npm:3.0.2"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["@types/d3-ease", [\
         ["npm:3.0.0", {\
           "packageLocation": "./.yarn/cache/@types-d3-ease-npm-3.0.0-b342ad1e9f-1be7c99364.zip/node_modules/@types/d3-ease/",\
@@ -5288,6 +5300,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["d3-drag", [\
+        ["npm:3.0.0", {\
+          "packageLocation": "./.yarn/cache/d3-drag-npm-3.0.0-cf7b48417f-d297231e60.zip/node_modules/d3-drag/",\
+          "packageDependencies": [\
+            ["d3-drag", "npm:3.0.0"],\
+            ["d3-dispatch", "npm:3.0.1"],\
+            ["d3-selection", "npm:3.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["d3-ease", [\
         ["npm:3.0.1", {\
           "packageLocation": "./.yarn/cache/d3-ease-npm-3.0.1-f8f3709dc7-06e2ee5326.zip/node_modules/d3-ease/",\
@@ -5326,6 +5349,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/preset-env", "virtual:cd6c56a667f71c219ece2fa9e5c888802ce463320a6e0d3b7f7787f2b175086075bde39e5a8e63af7c8444aee676f143792f2dcb05181d1861fa80ef97da30da#npm:7.18.2"],\
             ["@types/d3-axis", "npm:3.0.1"],\
             ["@types/d3-color", "npm:3.1.0"],\
+            ["@types/d3-drag", "npm:3.0.1"],\
             ["@types/d3-ease", "npm:3.0.0"],\
             ["@types/d3-interpolate", "npm:3.0.1"],\
             ["@types/d3-scale", "npm:4.0.2"],\
@@ -5338,6 +5362,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["babel-loader", "virtual:2ec16778ec8d3fa318ec65f0b01ad42f2afe652a7eb8f17308aa0f1b844ef6cee69055b54cf62c418781e10a0dbbf011742aaa9a8a78508b6858ea64ed5afc91#npm:8.2.5"],\
             ["d3-axis", "npm:3.0.0"],\
             ["d3-color", "npm:3.1.0"],\
+            ["d3-drag", "npm:3.0.0"],\
             ["d3-ease", "npm:3.0.1"],\
             ["d3-interpolate", "npm:3.0.1"],\
             ["d3-scale", "npm:4.0.2"],\
