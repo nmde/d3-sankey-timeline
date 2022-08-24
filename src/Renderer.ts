@@ -4,7 +4,7 @@ import { drag } from 'd3-drag';
 import { easeCubicIn } from 'd3-ease';
 import { interpolateHsl } from 'd3-interpolate';
 import { scaleLinear } from 'd3-scale';
-import { BaseType, select, selectAll } from 'd3-selection';
+import { BaseType, select, selectAll, Selection } from 'd3-selection';
 import { Transition, transition } from 'd3-transition';
 import SankeyTimeline from './SankeyTimeline';
 import type TimelineLink from './TimelineLink';
@@ -276,7 +276,7 @@ export default class Renderer {
    *
    * @param svg - The SVG element to render within.
    */
-  public render(svg: ReturnType<typeof select>): void {
+  public render(svg: Selection<BaseType, unknown, HTMLElement, any>): void {
     // Create labels
     svg
       .append('g')

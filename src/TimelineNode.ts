@@ -7,6 +7,8 @@ import { sum } from './util';
  * Represents a node in the timeline.
  */
 export default class TimelineNode {
+  public data: any;
+
   public graph: SankeyTimeline;
 
   public id: number;

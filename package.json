@@ -6,7 +6,8 @@
   "packageManager": "yarn@3.2.1",
   "scripts": {
     "test": "node .yarn/releases/yarn-3.2.1.cjs jest",
-    "build": "node .yarn/releases/yarn-3.2.1.cjs webpack"
+    "build": "node .yarn/releases/yarn-3.2.1.cjs webpack",
+    "build:emrald": "yarn webpack --config ./emrald.config.js"
   },
   "repository": {
     "type": "git",
