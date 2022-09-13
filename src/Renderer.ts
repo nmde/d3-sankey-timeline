@@ -446,9 +446,9 @@ export default class Renderer {
                 }
                 select(this).select('path').attr('d', l.layout.path);
               });
-              element.select('.distHandleLeft').attr('y', () => d.layout.y - d.layout.height / 2);
-              element.select('.distHandleCenter').attr('y', () => d.layout.y);
-              element.select('.distHandleRight').attr('y', () => d.layout.y  - d.layout.height / 2);
+              element.select('.distHandleLeft').attr('y', () => d.layout.y);
+              element.select('.distHandleCenter').attr('y', () => d.layout.y + d.layout.height / 2);
+              element.select('.distHandleRight').attr('y', () => d.layout.y);
             });
           }),
       );
