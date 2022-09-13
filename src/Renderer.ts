@@ -429,7 +429,6 @@ export default class Renderer {
                 .select('.meanValue')
                 .attr('x', () => d.layout.x + d.layout.width / 2)
                 .attr('y', () => d.layout.y - options.meanBarWidth);
-              
               selectAll<BaseType, TimelineLink>('.link').each(function (l) {
                 const path = l.layout.path.substring(1).split(',');
                 if (l.source.id === d.id) {
@@ -447,6 +446,9 @@ export default class Renderer {
                 }
                 select(this).select('path').attr('d', l.layout.path);
               });
+              element.select('.distHandleLeft').attr('y', () => d.layout.y - d.layout.height / 2);
+              element.select('.distHandleCenter').attr('y', () => d.layout.y);
+              element.select('.distHandleRight').attr('y', () => d.layout.y  - d.layout.height / 2);
             });
           }),
       );
