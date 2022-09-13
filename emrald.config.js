@@ -7,6 +7,7 @@ module.exports = frontend(
   path.resolve(__dirname, 'src', 'emrald.ts'),
   path.resolve(__dirname, 'dist'),
   {
+    mode: 'production',
     output: {
       library: 'sankeyTimeline',
     },
