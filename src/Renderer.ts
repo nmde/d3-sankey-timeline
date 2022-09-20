@@ -48,6 +48,7 @@ export default class Renderer {
     meanBarWidth: 3,
     nodeTitle: (d: TimelineNode): string => d.label,
     startColor: 'purple',
+    ticks: 25,
     transitionSpeed: 75,
     width: window.innerWidth,
   };
@@ -304,8 +305,22 @@ export default class Renderer {
         .attr('width', '100%')
         .attr('height', this.options.axisHeight)
         .attr('fill', this.options.axisColor);
-      for (let i = this.timeline.minTime; i <= this.timeline.maxTime; i += 1) {
-        if (Math.round(i) % 1000 === 0) {
+      for (
+        let i = Math.max(this.timeline.minTime, 0);
+        i <= this.timeline.maxTime;
+        i += 1
+      ) {
+        if (
+          i %
+            10 **
+              ((Math.round(
+                (this.timeline.maxTime - this.timeline.minTime) /
+                  this.options.ticks,
+              ) %
+                10) -
+                2) ===
+          0
+        ) {
           const x = this.getTimeX(i);
           axisContainer
             .append('text')
@@ -315,10 +330,13 @@ export default class Renderer {
             .attr('font-size', this.options.axisFontSize);
           axisContainer
             .append('rect')
-            .style('height', this.options.axisTickHeight)
+            .style(
+              'height',
+              this.options.axisTickHeight - this.options.axisHeight,
+            )
             .style('width', this.options.axisTickWidth)
             .attr('x', x)
-            .attr('y', 0)
+            .attr('y', this.options.axisHeight)
             .attr('fill', this.options.axisColor);
         }
       }
