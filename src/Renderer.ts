@@ -1,16 +1,14 @@
-import { axisBottom } from 'd3-axis';
 import { color, HSLColor, RGBColor } from 'd3-color';
 import { drag } from 'd3-drag';
 import { easeCubicIn } from 'd3-ease';
 import { interpolateHsl } from 'd3-interpolate';
-import { scaleLinear } from 'd3-scale';
 import { BaseType, select, selectAll, Selection } from 'd3-selection';
 import { Transition, transition } from 'd3-transition';
 import SankeyTimeline from './SankeyTimeline';
 import type TimelineLink from './TimelineLink';
 import TimelineNode from './TimelineNode';
 import type { TimelineGraph } from './types';
-import { getKeyTimes, hasDist } from './util';
+import { hasDist } from './util';
 
 // The typings for d3-transition are incompatible with d3-selection, so we have to use ts-ignore when using transitions.
 
@@ -23,9 +21,13 @@ export default class Renderer {
     nodes: [],
   };
 
-  private minY = 0;
-
   public options = {
+    axisColor: 'rgba(0,0,0,0.25)',
+    axisFontSize: 8,
+    axisHeight: 2,
+    axisMargin: 8,
+    axisTickHeight: 12,
+    axisTickWidth: 3,
     curveHeight: 50,
     curveWidth: 200,
     distHandleWidth: 3,
@@ -38,7 +40,7 @@ export default class Renderer {
     fontSize: 25,
     height: window.innerHeight,
     layout: 0,
-    margin: 100,
+    margin: 0,
     marginTop: 25,
     maxLinkWidth: 50,
     maxNodeHeight: 100,
@@ -175,6 +177,7 @@ export default class Renderer {
     const rows: TimelineNode[][] = [];
     const placed: number[] = [];
     this.graph.nodes.forEach((node) => {
+      node.layout.x -= node.layout.width / 2;
       if (placed.indexOf(node.id) < 0) {
         rows.push([]);
         this.findNodeOverlaps(node)
@@ -234,18 +237,7 @@ export default class Renderer {
    */
   private initializeLayout() {
     this.graph.nodes.forEach((node, n) => {
-      let keyTimes = [node.times.startTime, node.times.endTime];
-      if (this.options.distributions) {
-        keyTimes = getKeyTimes(node.times);
-      }
       const x = this.getTimeX(node.times.meanTime || 0);
-      // TODO: Fix the positions
-      /*
-      let width = this.getTimeX(keyTimes[1]) - x;
-      if (Number.isNaN(width)) {
-        width = 0;
-      }
-      */
       const width = node.layout.width;
       let height = this.options.maxNodeHeight;
       if (this.options.dynamicNodeHeight) {
@@ -292,7 +284,8 @@ export default class Renderer {
       .text((d) => d.label)
       .each(function (d) {
         d.textHeight = this.getBBox().height;
-        d.layout.width = this.getBBox().width;
+        d.textWidth = this.getBBox().width;
+        d.layout.width = d.textWidth;
       });
 
     const graph = this.calculateLayout();
@@ -303,18 +296,32 @@ export default class Renderer {
       .style('width', this.options.width)
       .style('height', this.options.height);
 
-    // Use d3-axis to create an axis
+    // Create the axis
     if (this.options.layout === 0) {
-      svg
-        .append('g')
-        .style('width', '100%')
-        .call(
-          axisBottom(
-            scaleLinear()
-              .domain([this.timeline.minTime, this.timeline.maxTime])
-              .range(this.range),
-          ),
-        );
+      const axisContainer = svg.append('g').style('width', '100%');
+      axisContainer
+        .append('rect')
+        .attr('width', '100%')
+        .attr('height', this.options.axisHeight)
+        .attr('fill', this.options.axisColor);
+      for (let i = this.timeline.minTime; i <= this.timeline.maxTime; i += 1) {
+        if (Math.round(i) % 1000 === 0) {
+          const x = this.getTimeX(i);
+          axisContainer
+            .append('text')
+            .text(Math.round(i))
+            .attr('x', x + this.options.axisTickWidth)
+            .attr('y', this.options.axisHeight + this.options.axisMargin)
+            .attr('font-size', this.options.axisFontSize);
+          axisContainer
+            .append('rect')
+            .style('height', this.options.axisTickHeight)
+            .style('width', this.options.axisTickWidth)
+            .attr('x', x)
+            .attr('y', 0)
+            .attr('fill', this.options.axisColor);
+        }
+      }
     }
 
     const gradient = interpolateHsl(
@@ -447,7 +454,9 @@ export default class Renderer {
                 select(this).select('path').attr('d', l.layout.path);
               });
               element.select('.distHandleLeft').attr('y', () => d.layout.y);
-              element.select('.distHandleCenter').attr('y', () => d.layout.y + d.layout.height / 2);
+              element
+                .select('.distHandleCenter')
+                .attr('y', () => d.layout.y + d.layout.height / 2);
               element.select('.distHandleRight').attr('y', () => d.layout.y);
             });
           }),
@@ -547,6 +556,17 @@ export default class Renderer {
       .text((d) => d.label)
       .attr('x', (d) => d.layout.x + d.layout.width / 2)
       .attr('y', (d) => d.layout.y + d.layout.height / 2);
+
+    // Label boxes
+    /*
+    nodes
+      .append('rect')
+      .style('fill', 'rgba(0,0,0,0.3)')
+      .attr('x', (d) => d.layout.x + d.layout.width / 2)
+      .attr('y', (d) => d.layout.y + d.layout.height / 2)
+      .attr('width', (d) => d.textWidth)
+      .attr('height', (d) => d.textHeight);
+    */
   }
 
   /**
@@ -556,9 +576,14 @@ export default class Renderer {
    * @returns - The scaled x coordinate.
    */
   private getTimeX(time: number): number {
+    let shift = this.timeline.minTime;
+    if (this.timeline.minTime < 0) {
+      shift = 0 - this.timeline.minTime;
+    }
     return (
       (this.range[1] - this.range[0]) *
-        (time / (this.timeline.maxTime - this.timeline.minTime)) +
+        ((time + shift) /
+          (this.timeline.maxTime + shift - (this.timeline.minTime + shift))) +
       this.range[0]
     );
   }

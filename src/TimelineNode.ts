@@ -30,6 +30,8 @@ export default class TimelineNode {
 
   public textHeight = 0;
 
+  public textWidth = 0;
+
   public times: NodeTimes;
 
   /**

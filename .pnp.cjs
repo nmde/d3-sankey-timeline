@@ -49,12 +49,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@typescript-eslint/eslint-plugin", "virtual:2ec16778ec8d3fa318ec65f0b01ad42f2afe652a7eb8f17308aa0f1b844ef6cee69055b54cf62c418781e10a0dbbf011742aaa9a8a78508b6858ea64ed5afc91#npm:5.28.0"],\
             ["@typescript-eslint/parser", "virtual:2ec16778ec8d3fa318ec65f0b01ad42f2afe652a7eb8f17308aa0f1b844ef6cee69055b54cf62c418781e10a0dbbf011742aaa9a8a78508b6858ea64ed5afc91#npm:5.28.0"],\
             ["babel-loader", "virtual:2ec16778ec8d3fa318ec65f0b01ad42f2afe652a7eb8f17308aa0f1b844ef6cee69055b54cf62c418781e10a0dbbf011742aaa9a8a78508b6858ea64ed5afc91#npm:8.2.5"],\
-            ["d3-axis", "npm:3.0.0"],\
             ["d3-color", "npm:3.1.0"],\
             ["d3-drag", "npm:3.0.0"],\
             ["d3-ease", "npm:3.0.1"],\
             ["d3-interpolate", "npm:3.0.1"],\
-            ["d3-scale", "npm:4.0.2"],\
             ["d3-selection", "npm:3.0.0"],\
             ["d3-transition", "virtual:2ec16778ec8d3fa318ec65f0b01ad42f2afe652a7eb8f17308aa0f1b844ef6cee69055b54cf62c418781e10a0dbbf011742aaa9a8a78508b6858ea64ed5afc91#npm:3.0.1"],\
             ["elementary-circuits-directed-graph", "npm:1.3.1"],\
@@ -5263,25 +5261,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
-      ["d3-array", [\
-        ["npm:3.1.6", {\
-          "packageLocation": "./.yarn/cache/d3-array-npm-3.1.6-fa4f0bcb75-32f515bd25.zip/node_modules/d3-array/",\
-          "packageDependencies": [\
-            ["d3-array", "npm:3.1.6"],\
-            ["internmap", "npm:2.0.3"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
-      ["d3-axis", [\
-        ["npm:3.0.0", {\
-          "packageLocation": "./.yarn/cache/d3-axis-npm-3.0.0-81ef16a9a5-227ddaa6d4.zip/node_modules/d3-axis/",\
-          "packageDependencies": [\
-            ["d3-axis", "npm:3.0.0"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
       ["d3-color", [\
         ["npm:3.1.0", {\
           "packageLocation": "./.yarn/cache/d3-color-npm-3.1.0-fc73fe3b15-4931fbfda5.zip/node_modules/d3-color/",\
@@ -5320,15 +5299,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
-      ["d3-format", [\
-        ["npm:3.1.0", {\
-          "packageLocation": "./.yarn/cache/d3-format-npm-3.1.0-dfc19924ca-f345ec3b8a.zip/node_modules/d3-format/",\
-          "packageDependencies": [\
-            ["d3-format", "npm:3.1.0"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
       ["d3-interpolate", [\
         ["npm:3.0.1", {\
           "packageLocation": "./.yarn/cache/d3-interpolate-npm-3.0.1-77ddca7977-a42ba314e2.zip/node_modules/d3-interpolate/",\
@@ -5360,12 +5330,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@typescript-eslint/eslint-plugin", "virtual:2ec16778ec8d3fa318ec65f0b01ad42f2afe652a7eb8f17308aa0f1b844ef6cee69055b54cf62c418781e10a0dbbf011742aaa9a8a78508b6858ea64ed5afc91#npm:5.28.0"],\
             ["@typescript-eslint/parser", "virtual:2ec16778ec8d3fa318ec65f0b01ad42f2afe652a7eb8f17308aa0f1b844ef6cee69055b54cf62c418781e10a0dbbf011742aaa9a8a78508b6858ea64ed5afc91#npm:5.28.0"],\
             ["babel-loader", "virtual:2ec16778ec8d3fa318ec65f0b01ad42f2afe652a7eb8f17308aa0f1b844ef6cee69055b54cf62c418781e10a0dbbf011742aaa9a8a78508b6858ea64ed5afc91#npm:8.2.5"],\
-            ["d3-axis", "npm:3.0.0"],\
             ["d3-color", "npm:3.1.0"],\
             ["d3-drag", "npm:3.0.0"],\
             ["d3-ease", "npm:3.0.1"],\
             ["d3-interpolate", "npm:3.0.1"],\
-            ["d3-scale", "npm:4.0.2"],\
             ["d3-selection", "npm:3.0.0"],\
             ["d3-transition", "virtual:2ec16778ec8d3fa318ec65f0b01ad42f2afe652a7eb8f17308aa0f1b844ef6cee69055b54cf62c418781e10a0dbbf011742aaa9a8a78508b6858ea64ed5afc91#npm:3.0.1"],\
             ["elementary-circuits-directed-graph", "npm:1.3.1"],\
@@ -5387,45 +5355,11 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "SOFT"\
         }]\
       ]],\
-      ["d3-scale", [\
-        ["npm:4.0.2", {\
-          "packageLocation": "./.yarn/cache/d3-scale-npm-4.0.2-d17a53447b-a9c770d283.zip/node_modules/d3-scale/",\
-          "packageDependencies": [\
-            ["d3-scale", "npm:4.0.2"],\
-            ["d3-array", "npm:3.1.6"],\
-            ["d3-format", "npm:3.1.0"],\
-            ["d3-interpolate", "npm:3.0.1"],\
-            ["d3-time", "npm:3.0.0"],\
-            ["d3-time-format", "npm:4.1.0"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
       ["d3-selection", [\
         ["npm:3.0.0", {\
           "packageLocation": "./.yarn/cache/d3-selection-npm-3.0.0-39a42b4ca9-f4e60e1333.zip/node_modules/d3-selection/",\
           "packageDependencies": [\
             ["d3-selection", "npm:3.0.0"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
-      ["d3-time", [\
-        ["npm:3.0.0", {\
-          "packageLocation": "./.yarn/cache/d3-time-npm-3.0.0-a4963e64c8-01646568ef.zip/node_modules/d3-time/",\
-          "packageDependencies": [\
-            ["d3-time", "npm:3.0.0"],\
-            ["d3-array", "npm:3.1.6"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
-      ["d3-time-format", [\
-        ["npm:4.1.0", {\
-          "packageLocation": "./.yarn/cache/d3-time-format-npm-4.1.0-7f352c4634-7342bce283.zip/node_modules/d3-time-format/",\
-          "packageDependencies": [\
-            ["d3-time-format", "npm:4.1.0"],\
-            ["d3-time", "npm:3.0.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -7185,15 +7119,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["get-intrinsic", "npm:1.1.2"],\
             ["has", "npm:1.0.3"],\
             ["side-channel", "npm:1.0.4"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
-      ["internmap", [\
-        ["npm:2.0.3", {\
-          "packageLocation": "./.yarn/cache/internmap-npm-2.0.3-d74f5c9998-7ca41ec6ab.zip/node_modules/internmap/",\
-          "packageDependencies": [\
-            ["internmap", "npm:2.0.3"]\
           ],\
           "linkType": "HARD"\
         }]\
